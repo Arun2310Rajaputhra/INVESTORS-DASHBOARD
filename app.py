@@ -19,7 +19,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main-header {
-        font-size: 2.5rem;
+        font-size: 2.1rem;
         color: #1E88E5;
         margin-bottom: 1rem;
         animation: fadeIn 1s;
