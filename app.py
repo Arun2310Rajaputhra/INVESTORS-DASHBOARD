@@ -51,8 +51,8 @@ def load_excel_data():
     """Load all sheets from the Excel file"""
     try:
         # For local testing
-        excel_path = "big_small_INVESTMENT_DETAILS_UPDATE.xlsx"
-        excel_data = pd.ExcelFile(excel_path)
+        github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/big_small_INVESTMENT_DETAILS_UPDATE.xlsx"
+        excel_data = pd.ExcelFile(github_url)
         
         # Load all sheets
         sheets = {}
