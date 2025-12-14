@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import numpy as np
 import os
+import time
 
 # Page configuration
 st.set_page_config(
@@ -14,23 +15,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Custom CSS with animations
 st.markdown("""
 <style>
     .main-header {
         font-size: 2.5rem;
         color: #1E88E5;
         margin-bottom: 1rem;
+        animation: fadeIn 1s;
     }
     .metric-card {
-        background-color: #4B0082;
+        background-color: #001F3F;
+        color: white;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        animation: slideUp 0.5s ease-out;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
     .profit-positive {
         color: #00C853;
         font-weight: bold;
+        animation: pulse 2s infinite;
     }
     .profit-negative {
         color: #FF5252;
@@ -42,35 +52,73 @@ st.markdown("""
         padding: 1rem;
         border-radius: 5px;
         margin: 0.5rem 0;
+        animation: fadeIn 0.5s;
+    }
+    .success-message {
+        animation: slideIn 0.5s, fadeOut 2s 3s forwards;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+@st.cache_data(ttl=300)
 def load_excel_data():
     """Load all sheets from the Excel file"""
-    try:
-        # For local testing
-        github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/big_small_INVESTMENT_DETAILS_UPDATE.xlsx"
-        excel_data = pd.ExcelFile(github_url)
-        
-        # Load all sheets
-        sheets = {}
-        for sheet_name in excel_data.sheet_names:
-            # Handle different sheet name variations
-            if sheet_name in ['Platform_Maintaince_Charges', 'Platform_Maintenance_Charges', 'Charges']:
-                df = excel_data.parse(sheet_name)
-                # Clean column names - remove extra spaces
-                df.columns = df.columns.str.strip()
-                sheets[sheet_name] = df
-            else:
-                sheets[sheet_name] = excel_data.parse(sheet_name)
-        
-        return sheets
-    except Exception as e:
-        st.error(f"Error loading data: {str(e)}")
-        # Return empty dataframes if file not found
-        return {}
+    # Show loading animation
+    loading_placeholder = st.empty()
+    with loading_placeholder.container():
+        with st.spinner('📊 Loading latest investment data...'):
+            try:
+                github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/big_small_INVESTMENT_DETAILS_UPDATE.xlsx"
+                excel_data = pd.ExcelFile(github_url)
+                
+                # Load all sheets
+                sheets = {}
+                for sheet_name in excel_data.sheet_names:
+                    if sheet_name in ['Platform_Maintaince_Charges', 'Platform_Maintenance_Charges', 'Charges']:
+                        df = excel_data.parse(sheet_name)
+                        df.columns = df.columns.str.strip()
+                        sheets[sheet_name] = df
+                    else:
+                        sheets[sheet_name] = excel_data.parse(sheet_name)
+                
+                # Success animation
+                st.success("✅ Data loaded successfully!")
+                time.sleep(0.5)
+                
+                return sheets
+            except Exception as e:
+                st.error(f"❌ Error loading data: {str(e)}")
+                return {}
+            finally:
+                time.sleep(0.5)
+                loading_placeholder.empty()
 
 def calculate_user_metrics(user_id, data):
     """Calculate all metrics for a specific user"""
@@ -179,7 +227,7 @@ def create_company_profit_graph(data):
         company_daily,
         x='Date',
         y='Profit',
-        title='Company Daily Profit Trend (Positive Profits Only)',
+        title='📈 Company Daily Profit Trend (Positive Profits Only)',
         markers=True,
         line_shape='spline'
     )
@@ -188,7 +236,8 @@ def create_company_profit_graph(data):
         xaxis_title='Date',
         yaxis_title='Total Profit (₹)',
         hovermode='x unified',
-        template='plotly_white'
+        template='plotly_white',
+        transition={'duration': 500}  # Smooth animation
     )
     
     return fig
@@ -226,11 +275,20 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
 def main():
     st.title("📊 Investment Dashboard")
     
+    # Add welcome animation
+    welcome_text = "Welcome to Big Small Investments"
+    display = st.empty()
+    for i in range(len(welcome_text) + 1):
+        display.markdown(f"<h2 style='text-align: center;'>{welcome_text[:i]}|</h2>", unsafe_allow_html=True)
+        time.sleep(0.05)
+    time.sleep(0.5)
+    display.empty()
+    
     # Load data
     data = load_excel_data()
     
     if not data:
-        st.error("No data loaded. Please check the data source.")
+        st.error("❌ No data loaded. Please check the data source.")
         return
     
     # Sidebar for login and filters
@@ -253,7 +311,9 @@ def main():
                 metrics = calculate_user_metrics(selected_user, data)
                 
                 if metrics:
-                    st.success(f"Welcome, {metrics['name']}!")
+                    # Success animation for login
+                    st.success(f"✅ Welcome, {metrics['name']}!")
+                    time.sleep(0.5)
                     
                     # Date range filter
                     st.header("📅 Filters")
@@ -286,8 +346,17 @@ def main():
     
     # Main Dashboard
     if metrics:
-        # Welcome header
+        # Welcome header with animation
         st.markdown(f"<h1 class='main-header'>Hello, {metrics['name']}!</h1>", unsafe_allow_html=True)
+        
+        # Profit celebration animation
+        if metrics['total_profit'] > 0:
+            st.balloons()
+            st.markdown("""<div class='success-message'>
+                <div class='stAlert' style='background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px;'>
+                    🎉 Great! You're making positive profits!
+                </div>
+            </div>""", unsafe_allow_html=True)
         
         # Key Metrics in columns
         st.subheader("📈 Investment Overview")
@@ -295,12 +364,12 @@ def main():
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.markdown("""
+            st.markdown(f"""
             <div class='metric-card'>
                 <h4>Your Total Investment</h4>
-                <h2>₹{:,}</h2>
+                <h2>₹{int(metrics['total_investment']):,}</h2>
             </div>
-            """.format(int(metrics['total_investment'])), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         with col2:
             profit_class = "profit-positive" if metrics['total_profit'] >= 0 else "profit-negative"
@@ -349,19 +418,27 @@ def main():
         )
         
         if not filtered_data.empty:
-            # Display summary stats
+            # Display summary stats with animation
             total_profit_filtered = filtered_data['Profit'].sum()
             avg_daily_filtered = filtered_data['Profit'].mean()
             
             col1, col2 = st.columns(2)
             with col1:
-                st.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
-                         f"₹{total_profit_filtered:,.2f}")
+                # Animated counter for total profit
+                placeholder = st.empty()
+                for i in range(0, int(total_profit_filtered) + 1, max(1, int(total_profit_filtered/20))):
+                    placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
+                                     f"₹{i:,.2f}")
+                    time.sleep(0.02)
+                placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
+                                 f"₹{total_profit_filtered:,.2f}")
+            
             with col2:
                 st.metric(f"Average Daily Profit", 
                          f"₹{avg_daily_filtered:,.2f}")
             
-            # Display the table
+            # Display the table with fade-in animation
+            st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
             display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Payment']
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
@@ -376,6 +453,7 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
+            st.markdown("</div>", unsafe_allow_html=True)
             
             # Download button for filtered data
             csv = filtered_data.to_csv(index=False)
