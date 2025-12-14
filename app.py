@@ -347,7 +347,7 @@ def main():
     # Main Dashboard
     if metrics:
         # Welcome header with animation
-        st.markdown(f"<h1 class='main-header'>Hello, {metrics['name']}!</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h3 class='main-header'>Hello, {metrics['name']}!</h3>", unsafe_allow_html=True)
         
         # Profit celebration animation
         if metrics['total_profit'] > 0:
