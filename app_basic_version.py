@@ -6,251 +6,100 @@ from datetime import datetime, timedelta
 import numpy as np
 import os
 import time
-import base64
 
 # Page configuration
 st.set_page_config(
-    page_title="QUANTUM PREDICTIONS",
+    page_title="Investment Dashboard",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Function to encode image to base64
-def get_image_base64(image_path):
-    try:
-        if os.path.exists(image_path):
-            with open(image_path, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode()
-    except:
-        return None
-
-# Try to get base64 for background image (for local testing)
-background_base64 = None
-title_header_base64 = None
-
-# Custom CSS with animations and background
-st.markdown(f"""
+# Custom CSS with animations
+st.markdown("""
 <style>
-    /* Main background with uploaded image */
-    .stApp {{
-        background: linear-gradient(rgba(0, 15, 40, 0.85), rgba(0, 15, 40, 0.9)),
-                    url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background_website.jpg');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-        min-height: 100vh;
-    }}
-    
-    /* Header styling */
-    .main-header {{
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 0.5rem;
+    .main-header {
+        font-size: 1.6rem;
+        color: #1E88E5;
+        margin-bottom: 1rem;
         animation: fadeIn 1s;
-    }}
-    
-    /* Title header image styling */
-    .title-header-img {{
-        max-width: 100%;
-        height: auto;
-        margin: 0 auto;
-        display: block;
-        animation: fadeIn 1s ease-out;
-    }}
-    
-    /* On mobile, make title header responsive */
-    @media (max-width: 768px) {{
-        .title-header-img {{
-            max-width: 95%;
-            margin-top: 0.5rem;
-        }}
-    }}
-    
-    /* Quantum Predictions zoom animation */
-    .quantum-title {{
-        font-size: 3rem;
-        font-weight: 800;
-        background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        text-align: center;
-        margin: 1rem 0 0.5rem 0;
-        animation: zoomIn 1s ease-out;
-    }}
-    
-    .quantum-subtitle {{
-        font-size: 1.2rem;
-        color: #a0d2ff;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-weight: 300;
-        letter-spacing: 2px;
-        animation: fadeInUp 1s ease-out 0.5s both;
-    }}
-    
-    /* Content containers with transparency */
-    .main .block-container {{
-        padding-top: 1rem;
-        padding-bottom: 3rem;
-    }}
-    
-    .metric-card {{
-        background-color: rgba(0, 31, 63, 0.85);
+    }
+    .metric-card {
+        background-color: #001F3F;
         color: white;
         padding: 1.5rem;
         border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         animation: slideUp 0.5s ease-out;
-        border: 1px solid rgba(30, 136, 229, 0.3);
-        backdrop-filter: blur(10px);
-    }}
-    
-    .metric-card:hover {{
+    }
+    .metric-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-        border-color: rgba(30, 136, 229, 0.6);
-    }}
-    
-    .profit-positive {{
-        color: #00ff88;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .profit-positive {
+        color: #00C853;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-    }}
-    
-    .profit-negative {{
-        color: #ff5252;
+        animation: pulse 2s infinite;
+    }
+    .profit-negative {
+        color: #FF5252;
         font-weight: bold;
-    }}
-    
-    .pending-alert {{
-        background-color: rgba(255, 243, 205, 0.9);
+    }
+    .pending-alert {
+        background-color: #FFF3CD;
         border: 1px solid #FFEEBA;
         padding: 1rem;
         border-radius: 5px;
         margin: 0.5rem 0;
         animation: fadeIn 0.5s;
-    }}
-    
-    /* Dataframes with transparency */
-    .dataframe {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        border-radius: 8px;
-        overflow: hidden;
-    }}
-    
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {{
-        background-color: rgba(0, 20, 40, 0.9) !important;
-        border-right: 1px solid rgba(30, 136, 229, 0.3);
-    }}
-    
-    .sidebar .sidebar-content {{
-        background-color: transparent;
-    }}
-    
-    /* Money animation */
-    .money-celebration {{
+    }
+    .success-message {
+        animation: slideIn 0.5s, fadeOut 2s 3s forwards;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-    }}
-    
-    .money-symbol {{
-        position: absolute;
-        font-size: 2rem;
-        opacity: 0;
-        animation: moneyZoom 2s forwards;
-    }}
-    
-    /* Copyright footer */
-    .copyright-footer {{
-        position: fixed;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-size: 12px;
-        color: #aaa;
-        padding: 5px;
-        background-color: rgba(0, 0, 0, 0.3);
+        top: 20px;
+        right: 20px;
         z-index: 1000;
-    }}
+    }
     
     /* Animations */
-    @keyframes fadeIn {{
-        from {{ opacity: 0; }}
-        to {{ opacity: 1; }}
-    }}
-    
-    @keyframes slideUp {{
-        from {{ transform: translateY(20px); opacity: 0; }}
-        to {{ transform: translateY(0); opacity: 1; }}
-    }}
-    
-    @keyframes zoomIn {{
-        0% {{ transform: scale(0.3); opacity: 0; }}
-        70% {{ transform: scale(1.05); }}
-        100% {{ transform: scale(1); opacity: 1; }}
-    }}
-    
-    @keyframes fadeInUp {{
-        from {{ transform: translateY(20px); opacity: 0; }}
-        to {{ transform: translateY(0); opacity: 1; }}
-    }}
-    
-    @keyframes moneyZoom {{
-        0% {{ transform: scale(0.1) rotate(0deg); opacity: 0; }}
-        20% {{ opacity: 1; }}
-        80% {{ opacity: 1; }}
-        100% {{ transform: scale(2) rotate(20deg); opacity: 0; }}
-    }}
-    
-    /* Smooth transitions for plotly charts */
-    .js-plotly-plot .plotly {{
-        transition: opacity 0.5s ease-in-out;
-    }}
-    
-    /* Button styling */
-    .stButton > button {{
-        background-color: #1E88E5;
-        color: white;
-        border: none;
-        transition: all 0.3s;
-    }}
-    
-    .stButton > button:hover {{
-        background-color: #0d47a1;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
-    }}
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
 </style>
-""", unsafe_allow_html=True)
-
-# Add copyright footer
-st.markdown("""
-<div class="copyright-footer">
-    © Copyright 2011. All rights reserved with Rajaputra Arun Kumar, Hyderabad
-</div>
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=300)
 def load_excel_data():
     """Load all sheets from the Excel file"""
+    # Show loading animation
     loading_placeholder = st.empty()
     with loading_placeholder.container():
         with st.spinner('📊 Loading latest investment data...'):
             try:
+                # Updated Excel file name
                 github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/INVESTMENT_APP_DETAILS_UPDATE.xlsx"
                 excel_data = pd.ExcelFile(github_url)
                 
+                # Load all sheets
                 sheets = {}
                 for sheet_name in excel_data.sheet_names:
                     if sheet_name in ['Platform_Maintaince_Charges', 'Platform_Maintenance_Charges', 'Charges']:
@@ -260,6 +109,7 @@ def load_excel_data():
                     else:
                         sheets[sheet_name] = excel_data.parse(sheet_name)
                 
+                # Success animation
                 st.success("✅ Data loaded successfully!")
                 time.sleep(0.5)
                 
@@ -273,11 +123,13 @@ def load_excel_data():
 
 def calculate_user_metrics(user_id, data):
     """Calculate all metrics for a specific user"""
+    # Get investor details
     investor_df = data.get('Investor_Details', pd.DataFrame())
     daily_profits_df = data.get('Daily_Profits_Calculations', pd.DataFrame())
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
     charges_df = data.get('Platform_Maintaince_Charges', pd.DataFrame())
     
+    # Filter for current user
     user_info = investor_df[investor_df['UserID'] == user_id]
     
     if user_info.empty:
@@ -290,13 +142,15 @@ def calculate_user_metrics(user_id, data):
         'total_profit': float(user_info.iloc[0]['Total Profit Earned']) if 'Total Profit Earned' in user_info.columns else 0,
     }
     
+    # Calculate ROI
     if metrics['total_investment'] > 0:
         metrics['roi'] = (metrics['total_profit'] / metrics['total_investment']) * 100
     else:
         metrics['roi'] = 0
     
+    # Calculate expected monthly returns (average daily profit × 30)
     user_daily_profits = daily_report_df[daily_report_df['UserID'] == user_id]
-    user_daily_profits = user_daily_profits[user_daily_profits['Profit'] > 0]
+    user_daily_profits = user_daily_profits[user_daily_profits['Profit'] > 0]  # Exclude negatives
     
     if not user_daily_profits.empty:
         avg_daily_profit = user_daily_profits['Profit'].mean()
@@ -306,6 +160,7 @@ def calculate_user_metrics(user_id, data):
         metrics['expected_monthly'] = 0
         metrics['avg_daily_profit'] = 0
     
+    # Get investment history
     user_investments = daily_profits_df[daily_profits_df['UserID'] == user_id]
     user_investments = user_investments[user_investments['User_Invested_Amount'].notna()]
     
@@ -318,8 +173,10 @@ def calculate_user_metrics(user_id, data):
         })
     metrics['investment_history'] = investment_history
     
+    # Get pending charges - WITH ERROR HANDLING
     pending_charges = []
     if not charges_df.empty:
+        # Try to find UserID column with different variations
         user_id_column = None
         possible_column_names = ['UserID', 'Userid', 'USERID', 'userid', 'User ID', 'User_Id']
         
@@ -332,6 +189,7 @@ def calculate_user_metrics(user_id, data):
             user_charges = charges_df[charges_df[user_id_column] == user_id]
             if not user_charges.empty:
                 for _, row in user_charges.iterrows():
+                    # Get pending amount with error handling
                     pending_amt = 0
                     try:
                         pending_amt = float(row.get('Pending_Amt', 0))
@@ -359,6 +217,7 @@ def create_company_profit_graph(data):
     if daily_report_df.empty:
         return None
     
+    # Group by date and sum profits (exclude negatives)
     daily_report_df['Date'] = pd.to_datetime(daily_report_df['Date'])
     company_daily = daily_report_df[daily_report_df['Profit'] > 0].groupby('Date')['Profit'].sum().reset_index()
     
@@ -371,19 +230,15 @@ def create_company_profit_graph(data):
         y='Profit',
         title='📈 Company Daily Profit Trend (Positive Profits Only)',
         markers=True,
-        line_shape='spline',
-        color_discrete_sequence=['#00ff88']
+        line_shape='spline'
     )
     
     fig.update_layout(
         xaxis_title='Date',
         yaxis_title='Total Profit (₹)',
         hovermode='x unified',
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='white',
-        transition={'duration': 500}
+        template='plotly_white',
+        transition={'duration': 500}  # Smooth animation
     )
     
     return fig
@@ -395,11 +250,14 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     if daily_report_df.empty:
         return pd.DataFrame()
     
+    # Filter for user
     user_data = daily_report_df[daily_report_df['UserID'] == user_id].copy()
     
+    # Make sure Total_Profit column exists (rename if needed)
     if 'Total_Profit' not in user_data.columns and 'Total Profit' in user_data.columns:
         user_data['Total_Profit'] = user_data['Total Profit']
     
+    # Apply date filter if selected
     if selected_date:
         if isinstance(selected_date, list) and len(selected_date) == 2:
             start_date, end_date = selected_date
@@ -410,66 +268,26 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
         else:
             user_data = user_data[pd.to_datetime(user_data['Date']) == pd.to_datetime(selected_date)]
     
+    # Apply payment status filter
     if payment_status and payment_status != 'All':
         user_data = user_data[user_data['Payment'] == payment_status]
     
+    # Sort by date
     user_data = user_data.sort_values('Date', ascending=False)
     
     return user_data
 
-def show_money_animation():
-    """Show money symbol zoom animation"""
-    money_symbols = ['💰', '💵', '💎', '₹', '$', '💸', '🪙', '💶', '💷', '💴']
-    
-    # Create animation HTML
-    animation_html = """
-    <div class="money-celebration">
-    """
-    
-    # Add 15 random money symbols
-    for i in range(15):
-        symbol = np.random.choice(money_symbols)
-        left = np.random.randint(10, 90)
-        top = np.random.randint(10, 90)
-        delay = np.random.uniform(0, 1)
-        size = np.random.uniform(1.5, 3)
-        
-        animation_html += f"""
-        <div class="money-symbol" style="
-            left: {left}%;
-            top: {top}%;
-            font-size: {size}rem;
-            animation-delay: {delay}s;
-            color: {'#00ff88' if np.random.random() > 0.5 else '#00d2ff'};
-        ">{symbol}</div>
-        """
-    
-    animation_html += "</div>"
-    
-    # Display the animation
-    st.markdown(animation_html, unsafe_allow_html=True)
-    
-    # Remove animation after 2 seconds
-    time.sleep(2)
-    st.rerun()
-
 def main():
-    # Display title header image
-    st.markdown("""
-    <div class="main-header">
-        <img src="https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/title_header.jpg" 
-             alt="QUANTUM PREDICTIONS" 
-             class="title-header-img">
-    </div>
-    """, unsafe_allow_html=True)
+    st.title("📊 Investment Dashboard")
     
-    # Add zoom animation title (as fallback if image doesn't load)
-    st.markdown("""
-    <div style="display: none;">
-        <h1 class="quantum-title">QUANTUM PREDICTIONS</h1>
-        <p class="quantum-subtitle">AI-ENHANCED FORECASTING & SIMULATION</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Add welcome animation
+    welcome_text = "Welcome to QUANTUM PREDICTION"
+    display = st.empty()
+    for i in range(len(welcome_text) + 1):
+        display.markdown(f"<h3 style='text-align: center;'>{welcome_text[:i]}|</h3>", unsafe_allow_html=True)
+        time.sleep(0.05)
+    time.sleep(0.5)
+    display.empty()
     
     # Load data
     data = load_excel_data()
@@ -480,8 +298,9 @@ def main():
     
     # Sidebar for login and filters
     with st.sidebar:
-        st.markdown("## 🔐 User Login")
+        st.header("🔐 User Login")
         
+        # Get all user IDs for dropdown
         investor_df = data.get('Investor_Details', pd.DataFrame())
         if investor_df.empty:
             st.error("No investor data found.")
@@ -493,14 +312,18 @@ def main():
             selected_user = st.selectbox("Select your User ID:", user_ids)
             
             if selected_user:
+                # Calculate user metrics
                 metrics = calculate_user_metrics(selected_user, data)
                 
                 if metrics:
+                    # Success animation for login
                     st.success(f"✅ Welcome, {metrics['name']}!")
-                    time.sleep(0.3)
+                    time.sleep(0.5)
                     
-                    st.markdown("## 📅 Filters")
+                    # Date range filter
+                    st.header("📅 Filters")
                     
+                    # Date range selector
                     col1, col2 = st.columns(2)
                     with col1:
                         start_date = st.date_input("Start Date", 
@@ -511,6 +334,7 @@ def main():
                     
                     date_range = [start_date, end_date]
                     
+                    # Payment status filter
                     payment_status = st.selectbox(
                         "Payment Status:",
                         ["All", "Completed", "Pending", "Recovered"]
@@ -527,22 +351,28 @@ def main():
     
     # Main Dashboard
     if metrics:
-        # Show money animation if profit is positive
-        if metrics['total_profit'] > 0:
-            show_money_animation()
+        # Welcome header with animation
+        st.markdown(f"<h4 class='main-header'>Hello, {metrics['name']}!</h4>", unsafe_allow_html=True)
         
-        st.markdown(f"<h3 style='color: white; margin-bottom: 1.5rem;'>Hello, {metrics['name']}!</h3>", unsafe_allow_html=True)
+        # Profit celebration animation
+        if metrics['total_profit'] > 0:
+            st.balloons()
+            st.markdown("""<div class='success-message'>
+                <div class='stAlert' style='background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px;'>
+                    🎉 Great! You're making positive profits!
+                </div>
+            </div>""", unsafe_allow_html=True)
         
         # Key Metrics in columns
-        st.markdown("<h3 style='color: white;'>📈 Investment Overview</h3>", unsafe_allow_html=True)
+        st.subheader("📈 Investment Overview")
         
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.markdown(f"""
             <div class='metric-card'>
-                <h4 style='color: #a0d2ff;'>Your Total Investment</h4>
-                <h2 style='color: white;'>₹{int(metrics['total_investment']):,}</h2>
+                <h4>Your Total Investment</h4>
+                <h2>₹{int(metrics['total_investment']):,}</h2>
             </div>
             """, unsafe_allow_html=True)
         
@@ -550,7 +380,7 @@ def main():
             profit_class = "profit-positive" if metrics['total_profit'] >= 0 else "profit-negative"
             st.markdown(f"""
             <div class='metric-card'>
-                <h4 style='color: #a0d2ff;'>Your Total Profit</h4>
+                <h4>Your Total Profit</h4>
                 <h2 class='{profit_class}'>₹{metrics['total_profit']:,.2f}</h2>
             </div>
             """, unsafe_allow_html=True)
@@ -559,7 +389,7 @@ def main():
             roi_class = "profit-positive" if metrics['roi'] >= 0 else "profit-negative"
             st.markdown(f"""
             <div class='metric-card'>
-                <h4 style='color: #a0d2ff;'>ROI</h4>
+                <h4>ROI</h4>
                 <h2 class='{roi_class}'>{metrics['roi']:.2f}%</h2>
             </div>
             """, unsafe_allow_html=True)
@@ -567,14 +397,14 @@ def main():
         with col4:
             st.markdown(f"""
             <div class='metric-card'>
-                <h4 style='color: #a0d2ff;'>Expected Month End</h4>
-                <h2 style='color: white;'>₹{metrics['expected_monthly']:,.2f}</h2>
-                <small style='color: #a0d2ff;'>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
+                <h4>Expected Month End</h4>
+                <h2>₹{metrics['expected_monthly']:,.2f}</h2>
+                <small>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
             </div>
             """, unsafe_allow_html=True)
         
         # Company Profit Graph
-        st.markdown("<h3 style='color: white;'>📊 Company Profit Trend</h3>", unsafe_allow_html=True)
+        st.subheader("📊 Company Profit Trend")
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
             st.plotly_chart(profit_fig, use_container_width=True)
@@ -582,8 +412,9 @@ def main():
             st.info("No profit data available for graph.")
         
         # Filtered Data Table
-        st.markdown("<h3 style='color: white;'>📋 Your Profit Details</h3>", unsafe_allow_html=True)
+        st.subheader("📋 Your Profit Details")
         
+        # Get filtered data
         filtered_data = create_user_profit_table(
             metrics['user_id'], 
             data, 
@@ -592,18 +423,28 @@ def main():
         )
         
         if not filtered_data.empty:
+            # Display summary stats with animation
             total_profit_filtered = filtered_data['Profit'].sum()
             avg_daily_filtered = filtered_data['Profit'].mean()
             
             col1, col2 = st.columns(2)
             with col1:
-                st.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
-                         f"₹{total_profit_filtered:,.2f}")
+                # Animated counter for total profit
+                placeholder = st.empty()
+                for i in range(0, int(total_profit_filtered) + 1, max(1, int(total_profit_filtered/20))):
+                    placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
+                                     f"₹{i:,.2f}")
+                    time.sleep(0.02)
+                placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
+                                 f"₹{total_profit_filtered:,.2f}")
             
             with col2:
                 st.metric(f"Average Daily Profit", 
                          f"₹{avg_daily_filtered:,.2f}")
             
+            # Display the table with fade-in animation
+            st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
+            # Update display columns to include Total_Profit
             display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
@@ -619,7 +460,9 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
+            st.markdown("</div>", unsafe_allow_html=True)
             
+            # Download button for filtered data
             csv = filtered_data.to_csv(index=False)
             st.download_button(
                 label="📥 Download Filtered Data",
@@ -631,7 +474,7 @@ def main():
             st.info("No data found for the selected filters.")
         
         # Investment History
-        st.markdown("<h3 style='color: white;'>💰 Your Investment History</h3>", unsafe_allow_html=True)
+        st.subheader("💰 Your Investment History")
         if metrics['investment_history']:
             invest_df = pd.DataFrame(metrics['investment_history'])
             st.dataframe(
@@ -647,7 +490,7 @@ def main():
             st.info("No investment history found.")
         
         # Pending Charges
-        st.markdown("<h3 style='color: white;'>⚠️ Platform Charges Status</h3>", unsafe_allow_html=True)
+        st.subheader("⚠️ Platform Charges Status")
         if metrics['pending_charges']:
             for charge in metrics['pending_charges']:
                 st.markdown(f"""
@@ -664,16 +507,20 @@ def main():
             st.success("✅ All platform charges are cleared!")
         
         # Additional Insights
-        st.markdown("<h3 style='color: white;'>📊 Additional Insights</h3>", unsafe_allow_html=True)
+        st.subheader("📊 Additional Insights")
         
+        # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
         
+        # Calculate total company profit (sum of all profits)
         total_company_profit = 0
         if not daily_report_df.empty:
             total_company_profit = daily_report_df['Profit'].sum()
         
+        # Company total investment
         company_total = investor_df['Total_Invested_Amount'].sum() if not investor_df.empty else 0
         
+        # Display in 3 columns EXACTLY like the others
         col1, col2, col3 = st.columns(3)
         
         with col1:
