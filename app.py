@@ -418,36 +418,31 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def show_money_animation():
-    """Show money symbol zoom animation"""
-    money_symbols = ['💰', '💵', '💎', '₹', '$', '💸', '🪙']
+    """Simple money animation without complex formatting"""
+    import random
     
-    # Build HTML string
-    html_parts = ['<div class="money-celebration">']
+    symbols = ['💰', '💵', '₹', '$', '💎']
+    html = '<div class="money-celebration">'
     
-    for i in range(15):
-        symbol = np.random.choice(money_symbols)
-        left = np.random.randint(10, 90)
-        top = np.random.randint(10, 90)
-        delay = np.random.uniform(0, 1)
-        size = np.random.uniform(1.5, 2.5)
-        color = '#00ff88' if np.random.random() > 0.5 else '#00d2ff'
+    for _ in range(12):
+        sym = random.choice(symbols)
+        left = random.randint(5, 95)
+        top = random.randint(5, 95)
+        delay = random.uniform(0, 1.5)
+        size = random.uniform(1.2, 2.0)
         
-        html_parts.append(f'''
+        html += f'''
         <div class="money-symbol" style="
-            left: {left}%;
-            top: {top}%;
-            font-size: {size:.1f}rem;
-            animation-delay: {delay:.1f}s;
-            color: {color};
-        ">{symbol}</div>
-        ''')
+            left:{left}%;
+            top:{top}%;
+            font-size:{size}rem;
+            animation-delay:{delay}s;
+        ">{sym}</div>
+        '''
     
-    html_parts.append('</div>')
+    html += '</div>'
     
-    # Display animation
-    st.markdown(''.join(html_parts), unsafe_allow_html=True)
-    
-    # Wait and refresh
+    st.markdown(html, unsafe_allow_html=True)
     time.sleep(2)
     st.rerun()
 
