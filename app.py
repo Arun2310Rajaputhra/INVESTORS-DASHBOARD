@@ -281,10 +281,10 @@ def main():
     st.title("📊 Investment Dashboard")
     
     # Add welcome animation
-    welcome_text = "Welcome to Big Small Investments"
+    welcome_text = "Welcome to QUANTUM PREDICTION"
     display = st.empty()
     for i in range(len(welcome_text) + 1):
-        display.markdown(f"<h2 style='text-align: center;'>{welcome_text[:i]}|</h2>", unsafe_allow_html=True)
+        display.markdown(f"<h3 style='text-align: center;'>{welcome_text[:i]}|</h3>", unsafe_allow_html=True)
         time.sleep(0.05)
     time.sleep(0.5)
     display.empty()
@@ -352,7 +352,7 @@ def main():
     # Main Dashboard
     if metrics:
         # Welcome header with animation
-        st.markdown(f"<h3 class='main-header'>Hello, {metrics['name']}!</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h4 class='main-header'>Hello, {metrics['name']}!</h4>", unsafe_allow_html=True)
         
         # Profit celebration animation
         if metrics['total_profit'] > 0:
