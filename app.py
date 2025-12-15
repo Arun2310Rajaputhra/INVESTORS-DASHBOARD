@@ -421,7 +421,7 @@ def show_money_animation():
     """Show money symbol zoom animation"""
     money_symbols = ['💰', '💵', '💎', '₹', '$', '💸', '🪙', '💶', '💷', '💴']
     
-    # Create animation HTML
+    # Create animation HTML - FIXED: Proper string formatting
     animation_html = """
     <div class="money-celebration">
     """
@@ -433,14 +433,16 @@ def show_money_animation():
         top = np.random.randint(10, 90)
         delay = np.random.uniform(0, 1)
         size = np.random.uniform(1.5, 3)
+        color = '#00ff88' if np.random.random() > 0.5 else '#00d2ff'
         
+        # FIXED: Proper string concatenation
         animation_html += f"""
         <div class="money-symbol" style="
             left: {left}%;
             top: {top}%;
             font-size: {size}rem;
             animation-delay: {delay}s;
-            color: {'#00ff88' if np.random.random() > 0.5 else '#00d2ff'};
+            color: {color};
         ">{symbol}</div>
         """
     
@@ -451,6 +453,7 @@ def show_money_animation():
     
     # Remove animation after 2 seconds
     time.sleep(2)
+    # Use st.rerun() instead of st.experimental_rerun()
     st.rerun()
 
 def main():
