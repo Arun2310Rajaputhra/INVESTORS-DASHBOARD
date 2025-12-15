@@ -34,7 +34,7 @@ st.markdown("""
     
     /* Make Streamlit Title Smaller */
     .stTitle h1 {
-        font-size: 2.2rem !important;
+        font-size: 1.8rem !important;
         text-align: center;
     }
 
