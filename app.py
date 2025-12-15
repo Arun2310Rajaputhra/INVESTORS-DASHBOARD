@@ -293,7 +293,14 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    st.markdown("<h4 style='text-align: center;'>📊 QUANTUM AI PREDICTIONS</h4>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center;">
+        <h4 style="margin-bottom: 0; font-size: 2.5rem; color: #00d2ff;">QUANTUM PREDICTIONS</h4>
+        <p style="margin-top: 0; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+            AI-ENHANCED FORECASTING & SIMULATION
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Add welcome animation
     welcome_text = "Welcome to QUANTUM PREDICTION"
