@@ -95,7 +95,8 @@ def load_excel_data():
     with loading_placeholder.container():
         with st.spinner('📊 Loading latest investment data...'):
             try:
-                github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/big_small_INVESTMENT_DETAILS_UPDATE.xlsx"
+                # UPDATED EXCEL FILE NAME
+                github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/INVESTMENT_APP_DETAILS_UPDATE.xlsx"
                 excel_data = pd.ExcelFile(github_url)
                 
                 # Load all sheets
@@ -437,10 +438,21 @@ def main():
                 st.metric(f"Average Daily Profit", 
                          f"₹{avg_daily_filtered:,.2f}")
             
+            # Calculate company profit for each date in filtered data
+            if not filtered_data.empty:
+                # Group by date to get company profit (sum of all user profits for that date)
+                company_profit_by_date = filtered_data.groupby('Date')['Profit'].sum().reset_index()
+                company_profit_by_date = company_profit_by_date.rename(columns={'Profit': 'Company_Profit'})
+                
+                # Merge company profit back to filtered data
+                filtered_data = filtered_data.merge(company_profit_by_date, on='Date', how='left')
+                
+                # Update display columns to include Company_Profit
+                display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Company_Profit', 'Payment']
+                display_cols = [col for col in display_cols if col in filtered_data.columns]
+            
             # Display the table with fade-in animation
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
-            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Payment']
-            display_cols = [col for col in display_cols if col in filtered_data.columns]
             
             st.dataframe(
                 filtered_data[display_cols].rename(columns={
@@ -448,6 +460,7 @@ def main():
                     'Invest_Amount': 'Your Investment',
                     'Company_Total_Invest': 'Company Total',
                     'Profit': 'Your Profit',
+                    'Company_Profit': 'Company Profit',
                     'Payment': 'Status'
                 }),
                 use_container_width=True,
@@ -502,16 +515,32 @@ def main():
         # Additional Insights
         st.subheader("📊 Additional Insights")
         
+        # Calculate total company profit from Daily_Report sheet
+        daily_report_df = data.get('Daily_Report', pd.DataFrame())
+        total_company_profit = 0
+        if not daily_report_df.empty:
+            total_company_profit = daily_report_df['Profit'].sum()
+        
         # Company total investment
         company_total = investor_df['Total_Invested_Amount'].sum() if not investor_df.empty else 0
-        col1, col2 = st.columns(2)
+        total_investors = len(investor_df)
+        
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             st.metric("Total Company Investment", f"₹{company_total:,.2f}")
         
         with col2:
-            total_investors = len(investor_df)
             st.metric("Total Investors", total_investors)
+        
+        with col3:
+            profit_class = "profit-positive" if total_company_profit >= 0 else "profit-negative"
+            st.markdown(f"""
+            <div style='background-color: #f0f2f6; padding: 1rem; border-radius: 10px;'>
+                <h4>Total Company Profit</h4>
+                <h3 class='{profit_class}'>₹{total_company_profit:,.2f}</h3>
+            </div>
+            """, unsafe_allow_html=True)
     
     else:
         st.error("Could not load user metrics. Please try again.")
