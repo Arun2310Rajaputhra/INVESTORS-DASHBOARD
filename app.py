@@ -296,7 +296,7 @@ def main():
     st.markdown("""
     <div style="text-align: center;">
         <h6 style="margin-bottom: 0; font-size: 1.8rem; color: #00d2ff;"> QUANTUM PREDICTIONS</h6>
-        <p style="margin-top: -5; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+        <p style="margin-top: -20; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
             AI-ENHANCED FORECASTING & SIMULATION
     </p>
     </div>
