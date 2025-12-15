@@ -32,12 +32,7 @@ st.markdown("""
         padding-top: 1rem;
     }
     
-    /* Make Streamlit Title Smaller */
-    .stTitle h1 {
-        font-size: 1.8rem !important;
-        text-align: center;
-    }
-
+    
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
@@ -298,7 +293,7 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    st.title("📊 Investment Dashboard")
+    st.markdown("<h4 style='text-align: center;'>📊 QUANTUM AI PREDICTIONS</h4>", unsafe_allow_html=True)
     
     # Add welcome animation
     welcome_text = "Welcome to QUANTUM PREDICTION"
