@@ -20,7 +20,7 @@ st.markdown("""
 <style>
     /* Background image */
     .stApp {
-        background: url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background%20website.jpg');
+        background: url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background_website.jpg');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
