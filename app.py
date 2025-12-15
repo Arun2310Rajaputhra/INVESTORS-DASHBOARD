@@ -419,41 +419,36 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
 
 def show_money_animation():
     """Show money symbol zoom animation"""
-    money_symbols = ['💰', '💵', '💎', '₹', '$', '💸', '🪙', '💶', '💷', '💴']
+    money_symbols = ['💰', '💵', '💎', '₹', '$', '💸', '🪙']
     
-    # Create animation HTML - FIXED: Proper string formatting
-    animation_html = """
-    <div class="money-celebration">
-    """
+    # Build HTML string
+    html_parts = ['<div class="money-celebration">']
     
-    # Add 15 random money symbols
     for i in range(15):
         symbol = np.random.choice(money_symbols)
         left = np.random.randint(10, 90)
         top = np.random.randint(10, 90)
         delay = np.random.uniform(0, 1)
-        size = np.random.uniform(1.5, 3)
+        size = np.random.uniform(1.5, 2.5)
         color = '#00ff88' if np.random.random() > 0.5 else '#00d2ff'
         
-        # FIXED: Proper string concatenation
-        animation_html += f"""
+        html_parts.append(f'''
         <div class="money-symbol" style="
             left: {left}%;
             top: {top}%;
-            font-size: {size}rem;
-            animation-delay: {delay}s;
+            font-size: {size:.1f}rem;
+            animation-delay: {delay:.1f}s;
             color: {color};
         ">{symbol}</div>
-        """
+        ''')
     
-    animation_html += "</div>"
+    html_parts.append('</div>')
     
-    # Display the animation
-    st.markdown(animation_html, unsafe_allow_html=True)
+    # Display animation
+    st.markdown(''.join(html_parts), unsafe_allow_html=True)
     
-    # Remove animation after 2 seconds
+    # Wait and refresh
     time.sleep(2)
-    # Use st.rerun() instead of st.experimental_rerun()
     st.rerun()
 
 def main():
