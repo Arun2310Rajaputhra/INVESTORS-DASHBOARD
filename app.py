@@ -32,6 +32,12 @@ st.markdown("""
         padding-top: 1rem;
     }
     
+    /* Make Streamlit Title Smaller */
+    .stTitle h1 {
+        font-size: 2.2rem !important;
+        text-align: center;
+    }
+
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
