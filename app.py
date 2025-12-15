@@ -18,6 +18,20 @@ st.set_page_config(
 # Custom CSS with animations
 st.markdown("""
 <style>
+    /* Background image */
+    .stApp {
+        background: url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background%20website.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
+    /* Make content readable */
+    .main .block-container {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding-top: 1rem;
+    }
+    
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
