@@ -111,6 +111,27 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* Rupee Animation */
+    .rupee-celebration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+    
+    .rupee-symbol {
+        position: absolute;
+        font-size: 2rem;
+        opacity: 0;
+        animation: rupeeZoom 2s forwards;
+        color: gold;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -133,6 +154,36 @@ st.markdown("""
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
+    
+    /* Rupee Zoom Animation */
+    @keyframes rupeeZoom {
+        0% { 
+            transform: scale(0.1) rotate(0deg); 
+            opacity: 0;
+            top: 80%;
+            left: 50%;
+        }
+        20% { 
+            opacity: 1;
+            transform: scale(1.2) rotate(10deg);
+        }
+        40% {
+            transform: scale(2.5) rotate(-10deg);
+        }
+        60% {
+            transform: scale(3.5) rotate(5deg);
+        }
+        80% { 
+            opacity: 1;
+            transform: scale(4.5) rotate(-5deg);
+        }
+        100% { 
+            transform: scale(6) rotate(0deg); 
+            opacity: 0;
+            top: 20%;
+            left: 50%;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -142,6 +193,78 @@ st.markdown("""
     © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
 </div>
 """, unsafe_allow_html=True)
+
+# Function for rupee animation
+def show_rupee_animation():
+    """Show rupee symbol zoom animation"""
+    import random
+    
+    # Create HTML for rupee animation
+    html = """
+    <div class="rupee-celebration">
+        <div class="rupee-symbol" style="
+            left: 50%;
+            top: 80%;
+            font-size: 3rem;
+            animation-delay: 0s;
+            color: gold;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
+        ">₹</div>
+        
+        <div class="rupee-symbol" style="
+            left: 45%;
+            top: 75%;
+            font-size: 2.5rem;
+            animation-delay: 0.1s;
+            color: #FFD700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+        ">₹</div>
+        
+        <div class="rupee-symbol" style="
+            left: 55%;
+            top: 70%;
+            font-size: 2.8rem;
+            animation-delay: 0.2s;
+            color: #FFC107;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+        ">₹</div>
+        
+        <div class="rupee-symbol" style="
+            left: 40%;
+            top: 65%;
+            font-size: 2.2rem;
+            animation-delay: 0.3s;
+            color: #FF9800;
+            text-shadow: 0 0 8px rgba(255, 152, 0, 0.6);
+        ">₹</div>
+        
+        <div class="rupee-symbol" style="
+            left: 60%;
+            top: 60%;
+            font-size: 2.6rem;
+            animation-delay: 0.4s;
+            color: #FF5722;
+            text-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+        ">₹</div>
+    </div>
+    """
+    
+    # Display the animation
+    st.markdown(html, unsafe_allow_html=True)
+    
+    # Wait for animation to complete
+    time.sleep(2)
+    # Use JavaScript to remove the animation after completion
+    st.markdown("""
+    <script>
+        setTimeout(function() {
+            var elements = document.getElementsByClassName('rupee-celebration');
+            while(elements.length > 0){
+                elements[0].parentNode.removeChild(elements[0]);
+            }
+        }, 2000);
+    </script>
+    """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=300)
 def load_excel_data():
@@ -423,9 +546,9 @@ def main():
         # Welcome header with animation
         st.markdown(f"<h6 class='main-header'>Hello, {metrics['name']}!</h6>", unsafe_allow_html=True)
         
-        # Profit celebration animation
+        # Profit celebration animation - REPLACED BALLOONS WITH RUPEE ANIMATION
         if metrics['total_profit'] > 0:
-            st.balloons()
+            show_rupee_animation()
             st.markdown("""<div class='success-message'>
                 <div class='stAlert' style='background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px;'>
                     🎉 Great! You're making positive profits!
