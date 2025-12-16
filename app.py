@@ -339,12 +339,13 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
+    # SOLUTION 1: Using rem units
     st.markdown("""
     <div style="text-align: center;">
-        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;"> QUANTUM PREDICTIONS</h6>
-        <p style="margin-top: -20; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
+        <p style="margin-top: -0.5rem; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
             AI-ENHANCED FORECASTING & SIMULATION
-    </p>
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
