@@ -42,7 +42,7 @@ st.markdown("""
         border-radius: 12px;
         padding: 1rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(1px);
     }
     
     .main-header {
@@ -108,7 +108,7 @@ st.markdown("""
         padding: 5px;
         background-color: rgba(0, 0, 0, 0.3);
         z-index: 1000;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(1px);
     }
     
     /* Animations */
