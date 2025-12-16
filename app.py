@@ -343,7 +343,7 @@ def main():
     st.markdown("""
     <div style="text-align: center;">
         <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
-        <p style="margin-top: -0.5rem; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+        <p style="margin-top: -0.9rem; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
             AI-ENHANCED FORECASTING & SIMULATION
         </p>
     </div>
@@ -421,7 +421,7 @@ def main():
     # Main Dashboard
     if metrics:
         # Welcome header with animation
-        st.markdown(f"<h4 class='main-header'>Hello, {metrics['name']}!</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h6 class='main-header'>Hello, {metrics['name']}!</h6>", unsafe_allow_html=True)
         
         # Profit celebration animation
         if metrics['total_profit'] > 0:
