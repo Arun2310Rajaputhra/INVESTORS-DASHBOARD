@@ -54,7 +54,7 @@ st.markdown("""
     
     /* GLASS EFFECT for Investment Overview metric cards ONLY */
     .metric-card {
-        background-color: rgba(0, 31, 63, 0.85); /* Changed to semi-transparent */
+        background-color: rgba(0, 31, 63, 0.75); /* Changed to semi-transparent */
         color: white;
         padding: 1.5rem;
         border-radius: 10px;
@@ -68,7 +68,7 @@ st.markdown("""
     .metric-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        background-color: rgba(0, 31, 63, 0.95); /* Slightly more opaque on hover */
+        background-color: rgba(0, 31, 63, 0.85); /* Slightly more opaque on hover */
     }
     
     .profit-positive {
