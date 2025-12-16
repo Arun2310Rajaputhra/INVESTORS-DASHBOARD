@@ -51,19 +51,26 @@ st.markdown("""
         margin-bottom: 1rem;
         animation: fadeIn 1s;
     }
+    
+    /* GLASS EFFECT for Investment Overview metric cards ONLY */
     .metric-card {
-        background-color: #001F3F;
+        background-color: rgba(0, 31, 63, 0.85); /* Changed to semi-transparent */
         color: white;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         animation: slideUp 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.1); /* Added glass border */
+        backdrop-filter: blur(5px); /* Added glass blur effect */
     }
+    
     .metric-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        background-color: rgba(0, 31, 63, 0.95); /* Slightly more opaque on hover */
     }
+    
     .profit-positive {
         color: #00C853;
         font-weight: bold;
