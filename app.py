@@ -244,7 +244,7 @@ st.markdown("""
 # Add copyright footer
 st.markdown("""
 <div class="copyright-footer">
-    © Copyright 2011. All rights reserved with Rajaputra Arun Kumar, Hyderabad
+    © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
 </div>
 """, unsafe_allow_html=True)
 
