@@ -32,6 +32,18 @@ st.markdown("""
         padding-top: 1rem;
     }
     
+    /* Transparent plotly charts container (from Code 2) */
+    .js-plotly-plot .plotly {
+        background-color: transparent !important;
+    }
+    
+    .plotly-container {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(1px);
+    }
     
     .main-header {
         font-size: 1.6rem;
@@ -39,19 +51,26 @@ st.markdown("""
         margin-bottom: 1rem;
         animation: fadeIn 1s;
     }
+    
+    /* GLASS EFFECT for Investment Overview metric cards ONLY */
     .metric-card {
-        background-color: #001F3F;
+        background-color: rgba(0, 31, 63, 0.55); /* Changed to semi-transparent */
         color: white;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         animation: slideUp 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.1); /* Added glass border */
+        backdrop-filter: blur(1px); /* Added glass blur effect */
     }
+    
     .metric-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        background-color: rgba(0, 31, 63, 0.65); /* Slightly more opaque on hover */
     }
+    
     .profit-positive {
         color: #00C853;
         font-weight: bold;
@@ -77,6 +96,21 @@ st.markdown("""
         z-index: 1000;
     }
     
+    /* Footer for copyright (from Code 2) */
+    .copyright-footer {
+        position: fixed;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 5px;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        backdrop-filter: blur(1px);
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -100,6 +134,13 @@ st.markdown("""
         100% { transform: scale(1); }
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Add copyright footer (from Code 2)
+st.markdown("""
+<div class="copyright-footer">
+    © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
+</div>
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=300)
@@ -226,7 +267,7 @@ def calculate_user_metrics(user_id, data):
     return metrics
 
 def create_company_profit_graph(data):
-    """Create company profit graph (excluding negatives)"""
+    """Create company profit graph (excluding negatives) with transparent style from Code 2"""
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
     
     if daily_report_df.empty:
@@ -239,21 +280,26 @@ def create_company_profit_graph(data):
     if company_daily.empty:
         return None
     
+    # Using style from Code 2
     fig = px.line(
         company_daily,
         x='Date',
         y='Profit',
         title='📈 Company Daily Profit Trend (Positive Profits Only)',
         markers=True,
-        line_shape='spline'
+        line_shape='spline',
+        color_discrete_sequence=['#00ff88']  # From Code 2
     )
     
     fig.update_layout(
         xaxis_title='Date',
         yaxis_title='Total Profit (₹)',
         hovermode='x unified',
-        template='plotly_white',
-        transition={'duration': 500}  # Smooth animation
+        template='plotly_dark',  # Changed from Code 1's 'plotly_white' to Code 2's 'plotly_dark'
+        plot_bgcolor='rgba(0,0,0,0)',  # From Code 2
+        paper_bgcolor='rgba(0,0,0,0)',  # From Code 2
+        font_color='white',  # From Code 2
+        transition={'duration': 500}
     )
     
     return fig
@@ -293,12 +339,13 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
+    # SOLUTION 1: Using rem units
     st.markdown("""
     <div style="text-align: center;">
-        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;"> QUANTUM PREDICTIONS</h6>
-        <p style="margin-top: -20; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
+        <p style="margin-top: -1.1rem; font-size: 0.66rem; color: #a0d2ff; letter-spacing: 1px;">
             AI-ENHANCED FORECASTING & SIMULATION
-    </p>
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -374,7 +421,7 @@ def main():
     # Main Dashboard
     if metrics:
         # Welcome header with animation
-        st.markdown(f"<h4 class='main-header'>Hello, {metrics['name']}!</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h6 class='main-header'>Hello, {metrics['name']}!</h6>", unsafe_allow_html=True)
         
         # Profit celebration animation
         if metrics['total_profit'] > 0:
@@ -425,11 +472,14 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         
-        # Company Profit Graph
+        # Company Profit Graph - Using transparent style from Code 2
         st.subheader("📊 Company Profit Trend")
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
+            # Wrap plotly chart in a transparent container from Code 2
+            st.markdown("<div class='plotly-container'>", unsafe_allow_html=True)
             st.plotly_chart(profit_fig, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.info("No profit data available for graph.")
         
@@ -474,10 +524,10 @@ def main():
                 filtered_data[display_cols].rename(columns={
                     'Date': 'Date',
                     'Invest_Amount': 'Your Investment',
-                    'Company_Total_Invest': 'Company Total',
+                    'Company_Total_Invest': 'Company Total Investment',
                     'Profit': 'Your Profit',
                     'Total_Profit': 'Company Profit',
-                    'Payment': 'Status'
+                    'Payment': 'Payment Status'
                 }),
                 use_container_width=True,
                 hide_index=True
