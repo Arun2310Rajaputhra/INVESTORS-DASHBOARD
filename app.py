@@ -516,10 +516,10 @@ def main():
                 filtered_data[display_cols].rename(columns={
                     'Date': 'Date',
                     'Invest_Amount': 'Your Investment',
-                    'Company_Total_Invest': 'Company Total',
+                    'Company_Total_Invest': 'Company Total Investment',
                     'Profit': 'Your Profit',
                     'Total_Profit': 'Company Profit',
-                    'Payment': 'Status'
+                    'Payment': 'Payment Status'
                 }),
                 use_container_width=True,
                 hide_index=True
