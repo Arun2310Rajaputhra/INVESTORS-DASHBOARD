@@ -62,7 +62,7 @@ st.markdown("""
         transition: transform 0.3s, box-shadow 0.3s;
         animation: slideUp 0.5s ease-out;
         border: 1px solid rgba(255, 255, 255, 0.1); /* Added glass border */
-        backdrop-filter: blur(5px); /* Added glass blur effect */
+        backdrop-filter: blur(1px); /* Added glass blur effect */
     }
     
     .metric-card:hover {
