@@ -15,66 +15,175 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with animations
+# Custom CSS with animations and transparent effects
 st.markdown("""
 <style>
-    /* Background image */
+    /* Background image with dark overlay for better readability */
     .stApp {
-        background: url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background_website.jpg');
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                    url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background_website.jpg');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        background-repeat: no-repeat;
+        min-height: 100vh;
     }
     
-    /* Make content readable */
+    /* Make content containers transparent */
     .main .block-container {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: transparent;
         padding-top: 1rem;
+        padding-bottom: 3rem;
     }
     
+    /* Transparent sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(0, 20, 40, 0.85) !important;
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
     
+    .sidebar .sidebar-content {
+        background-color: transparent;
+    }
+    
+    /* Glass-morphism effect for main header */
     .main-header {
         font-size: 1.6rem;
-        color: #1E88E5;
+        color: #FFFFFF;
         margin-bottom: 1rem;
         animation: fadeIn 1s;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
+    
+    /* Glass-morphism metric cards */
     .metric-card {
-        background-color: #001F3F;
+        background-color: rgba(0, 31, 63, 0.85);
         color: white;
         padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         transition: transform 0.3s, box-shadow 0.3s;
         animation: slideUp 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
     }
+    
     .metric-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 31, 63, 0.95);
+        border-color: rgba(30, 136, 229, 0.3);
     }
+    
+    /* Profit colors with glow effect */
     .profit-positive {
-        color: #00C853;
+        color: #00ff88;
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         animation: pulse 2s infinite;
     }
+    
     .profit-negative {
-        color: #FF5252;
+        color: #ff5252;
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
     }
+    
+    /* Transparent pending alerts */
     .pending-alert {
-        background-color: #FFF3CD;
-        border: 1px solid #FFEEBA;
+        background-color: rgba(255, 243, 205, 0.9);
+        border: 1px solid rgba(255, 238, 186, 0.8);
         padding: 1rem;
-        border-radius: 5px;
+        border-radius: 8px;
         margin: 0.5rem 0;
         animation: fadeIn 0.5s;
+        backdrop-filter: blur(5px);
     }
+    
+    /* Success message with transparency */
     .success-message {
         animation: slideIn 0.5s, fadeOut 2s 3s forwards;
         position: fixed;
         top: 20px;
         right: 20px;
         z-index: 1000;
+        background-color: rgba(212, 237, 218, 0.9);
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Transparent plotly charts container */
+    .js-plotly-plot .plotly {
+        background-color: transparent !important;
+    }
+    
+    .plotly-container {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Transparent dataframes */
+    .dataframe {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Transparent headers and titles */
+    h1, h2, h3, h4, h5, h6 {
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .stSubheader {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Transparent buttons */
+    .stButton > button {
+        background-color: rgba(30, 136, 229, 0.9);
+        color: white;
+        border: none;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+    }
+    
+    .stButton > button:hover {
+        background-color: rgba(13, 71, 161, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+    }
+    
+    /* Transparent select boxes and inputs */
+    .stSelectbox > div > div {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+    }
+    
+    .stDateInput > div > div {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Footer for copyright */
+    .copyright-footer {
+        position: fixed;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 5px;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
     }
     
     /* Animations */
@@ -82,24 +191,61 @@ st.markdown("""
         from { opacity: 0; }
         to { opacity: 1; }
     }
+    
     @keyframes slideUp {
         from { transform: translateY(20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
+    
     @keyframes slideIn {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
     }
+    
     @keyframes fadeOut {
         from { opacity: 1; }
         to { opacity: 0; }
     }
+    
     @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+        0% { transform: scale(1); text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+        50% { transform: scale(1.05); text-shadow: 0 0 15px rgba(0, 255, 136, 0.5); }
+        100% { transform: scale(1); text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+    }
+    
+    /* Title styling */
+    .dashboard-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: fadeIn 1s;
+    }
+    
+    .dashboard-title h6 {
+        font-size: 2.5rem !important;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+    
+    .dashboard-title p {
+        font-size: 1rem !important;
+        color: #a0d2ff !important;
+        letter-spacing: 2px;
+        font-weight: 300;
+        margin-top: -0.5rem;
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Add copyright footer
+st.markdown("""
+<div class="copyright-footer">
+    © Copyright 2011. All rights reserved with Rajaputra Arun Kumar, Hyderabad
+</div>
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=300)
@@ -245,15 +391,19 @@ def create_company_profit_graph(data):
         y='Profit',
         title='📈 Company Daily Profit Trend (Positive Profits Only)',
         markers=True,
-        line_shape='spline'
+        line_shape='spline',
+        color_discrete_sequence=['#00ff88']
     )
     
     fig.update_layout(
         xaxis_title='Date',
         yaxis_title='Total Profit (₹)',
         hovermode='x unified',
-        template='plotly_white',
-        transition={'duration': 500}  # Smooth animation
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='white',
+        transition={'duration': 500}
     )
     
     return fig
@@ -293,20 +443,19 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
+    # Enhanced dashboard title
     st.markdown("""
-    <div style="text-align: center;">
-        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;"> QUANTUM PREDICTIONS</h6>
-        <p style="margin-top: -20; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
-            AI-ENHANCED FORECASTING & SIMULATION
-    </p>
+    <div class="dashboard-title">
+        <h6>QUANTUM PREDICTIONS</h6>
+        <p>AI-ENHANCED FORECASTING & SIMULATION</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Add welcome animation
-    welcome_text = "Welcome to QUANTUM PREDICTION"
+    welcome_text = "Welcome to QUANTUM PREDICTIONS"
     display = st.empty()
     for i in range(len(welcome_text) + 1):
-        display.markdown(f"<h3 style='text-align: center;'>{welcome_text[:i]}|</h3>", unsafe_allow_html=True)
+        display.markdown(f"<h3 style='text-align: center; color: white;'>{welcome_text[:i]}|</h3>", unsafe_allow_html=True)
         time.sleep(0.05)
     time.sleep(0.5)
     display.empty()
@@ -320,7 +469,7 @@ def main():
     
     # Sidebar for login and filters
     with st.sidebar:
-        st.header("🔐 User Login")
+        st.markdown("## 🔐 User Login")
         
         # Get all user IDs for dropdown
         investor_df = data.get('Investor_Details', pd.DataFrame())
@@ -340,10 +489,9 @@ def main():
                 if metrics:
                     # Success animation for login
                     st.success(f"✅ Welcome, {metrics['name']}!")
-                    time.sleep(0.5)
+                    time.sleep(0.3)
                     
-                    # Date range filter
-                    st.header("📅 Filters")
+                    st.markdown("## 📅 Filters")
                     
                     # Date range selector
                     col1, col2 = st.columns(2)
@@ -380,21 +528,21 @@ def main():
         if metrics['total_profit'] > 0:
             st.balloons()
             st.markdown("""<div class='success-message'>
-                <div class='stAlert' style='background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px;'>
+                <div style='background-color: rgba(212, 237, 218, 0.9); color: #155724; padding: 1rem; border-radius: 5px; backdrop-filter: blur(5px);'>
                     🎉 Great! You're making positive profits!
                 </div>
             </div>""", unsafe_allow_html=True)
         
         # Key Metrics in columns
-        st.subheader("📈 Investment Overview")
+        st.markdown("<h3 style='color: white;'>📈 Investment Overview</h3>", unsafe_allow_html=True)
         
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.markdown(f"""
             <div class='metric-card'>
-                <h4>Your Total Investment</h4>
-                <h2>₹{int(metrics['total_investment']):,}</h2>
+                <h4 style='color: #a0d2ff;'>Your Total Investment</h4>
+                <h2 style='color: white;'>₹{int(metrics['total_investment']):,}</h2>
             </div>
             """, unsafe_allow_html=True)
         
@@ -402,7 +550,7 @@ def main():
             profit_class = "profit-positive" if metrics['total_profit'] >= 0 else "profit-negative"
             st.markdown(f"""
             <div class='metric-card'>
-                <h4>Your Total Profit</h4>
+                <h4 style='color: #a0d2ff;'>Your Total Profit</h4>
                 <h2 class='{profit_class}'>₹{metrics['total_profit']:,.2f}</h2>
             </div>
             """, unsafe_allow_html=True)
@@ -411,7 +559,7 @@ def main():
             roi_class = "profit-positive" if metrics['roi'] >= 0 else "profit-negative"
             st.markdown(f"""
             <div class='metric-card'>
-                <h4>ROI</h4>
+                <h4 style='color: #a0d2ff;'>ROI</h4>
                 <h2 class='{roi_class}'>{metrics['roi']:.2f}%</h2>
             </div>
             """, unsafe_allow_html=True)
@@ -419,22 +567,25 @@ def main():
         with col4:
             st.markdown(f"""
             <div class='metric-card'>
-                <h4>Expected Month End</h4>
-                <h2>₹{metrics['expected_monthly']:,.2f}</h2>
-                <small>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
+                <h4 style='color: #a0d2ff;'>Expected Month End</h4>
+                <h2 style='color: white;'>₹{metrics['expected_monthly']:,.2f}</h2>
+                <small style='color: #a0d2ff;'>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
             </div>
             """, unsafe_allow_html=True)
         
         # Company Profit Graph
-        st.subheader("📊 Company Profit Trend")
+        st.markdown("<h3 style='color: white;'>📊 Company Profit Trend</h3>", unsafe_allow_html=True)
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
+            # Wrap plotly chart in a transparent container
+            st.markdown("<div class='plotly-container'>", unsafe_allow_html=True)
             st.plotly_chart(profit_fig, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.info("No profit data available for graph.")
         
         # Filtered Data Table
-        st.subheader("📋 Your Profit Details")
+        st.markdown("<h3 style='color: white;'>📋 Your Profit Details</h3>", unsafe_allow_html=True)
         
         # Get filtered data
         filtered_data = create_user_profit_table(
@@ -451,21 +602,13 @@ def main():
             
             col1, col2 = st.columns(2)
             with col1:
-                # Animated counter for total profit
-                placeholder = st.empty()
-                for i in range(0, int(total_profit_filtered) + 1, max(1, int(total_profit_filtered/20))):
-                    placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
-                                     f"₹{i:,.2f}")
-                    time.sleep(0.02)
-                placeholder.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
-                                 f"₹{total_profit_filtered:,.2f}")
+                st.metric(f"Total Profit ({date_range[0]} to {date_range[1]})", 
+                         f"₹{total_profit_filtered:,.2f}")
             
             with col2:
                 st.metric(f"Average Daily Profit", 
                          f"₹{avg_daily_filtered:,.2f}")
             
-            # Display the table with fade-in animation
-            st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
             # Update display columns to include Total_Profit
             display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
             display_cols = [col for col in display_cols if col in filtered_data.columns]
@@ -482,7 +625,6 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
-            st.markdown("</div>", unsafe_allow_html=True)
             
             # Download button for filtered data
             csv = filtered_data.to_csv(index=False)
@@ -496,7 +638,7 @@ def main():
             st.info("No data found for the selected filters.")
         
         # Investment History
-        st.subheader("💰 Your Investment History")
+        st.markdown("<h3 style='color: white;'>💰 Your Investment History</h3>", unsafe_allow_html=True)
         if metrics['investment_history']:
             invest_df = pd.DataFrame(metrics['investment_history'])
             st.dataframe(
@@ -512,7 +654,7 @@ def main():
             st.info("No investment history found.")
         
         # Pending Charges
-        st.subheader("⚠️ Platform Charges Status")
+        st.markdown("<h3 style='color: white;'>⚠️ Platform Charges Status</h3>", unsafe_allow_html=True)
         if metrics['pending_charges']:
             for charge in metrics['pending_charges']:
                 st.markdown(f"""
@@ -529,7 +671,7 @@ def main():
             st.success("✅ All platform charges are cleared!")
         
         # Additional Insights
-        st.subheader("📊 Additional Insights")
+        st.markdown("<h3 style='color: white;'>📊 Additional Insights</h3>", unsafe_allow_html=True)
         
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
@@ -546,14 +688,29 @@ def main():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.metric("Total Company Investment", f"₹{company_total:,.2f}")
+            st.markdown(f"""
+            <div class='metric-card'>
+                <h4 style='color: #a0d2ff;'>Total Company Investment</h4>
+                <h2 style='color: white;'>₹{company_total:,.2f}</h2>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col2:
             total_investors = len(investor_df)
-            st.metric("Total Investors", total_investors)
+            st.markdown(f"""
+            <div class='metric-card'>
+                <h4 style='color: #a0d2ff;'>Total Investors</h4>
+                <h2 style='color: white;'>{total_investors}</h2>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col3:
-            st.metric("Total Company Profit", f"₹{total_company_profit:,.2f}")
+            st.markdown(f"""
+            <div class='metric-card'>
+                <h4 style='color: #a0d2ff;'>Total Company Profit</h4>
+                <h2 style='color: white;'>₹{total_company_profit:,.2f}</h2>
+            </div>
+            """, unsafe_allow_html=True)
     
     else:
         st.error("Could not load user metrics. Please try again.")

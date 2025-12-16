@@ -18,6 +18,21 @@ st.set_page_config(
 # Custom CSS with animations
 st.markdown("""
 <style>
+    /* Background image */
+    .stApp {
+        background: url('https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/background_website.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
+    /* Make content readable */
+    .main .block-container {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding-top: 1rem;
+    }
+    
+    
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
@@ -278,7 +293,14 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    st.title("📊 Investment Dashboard")
+    st.markdown("""
+    <div style="text-align: center;">
+        <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;"> QUANTUM PREDICTIONS</h6>
+        <p style="margin-top: -20; font-size: 0.8rem; color: #a0d2ff; letter-spacing: 1px;">
+            AI-ENHANCED FORECASTING & SIMULATION
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Add welcome animation
     welcome_text = "Welcome to QUANTUM PREDICTION"
