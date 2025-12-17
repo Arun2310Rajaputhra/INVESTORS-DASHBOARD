@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with animations
+# Custom CSS with animations - Keep this at the top
 st.markdown("""
 <style>
     /* Background image */
@@ -100,46 +100,6 @@ st.markdown("""
         100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
     }
     
-    .profit-positive {
-        color: #00C853;
-        font-weight: bold;
-        animation: pulse 2s infinite;
-    }
-    .profit-negative {
-        color: #FF5252;
-        font-weight: bold;
-    }
-    .pending-alert {
-        background-color: #FFF3CD;
-        border: 1px solid #FFEEBA;
-        padding: 1rem;
-        border-radius: 5px;
-        margin: 0.5rem 0;
-        animation: fadeIn 0.5s;
-    }
-    .success-message {
-        animation: slideIn 0.5s, fadeOut 2s 3s forwards;
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
-    
-    /* Footer for copyright (from Code 2) */
-    .copyright-footer {
-        position: fixed;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-        padding: 5px;
-        background-color: rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-        backdrop-filter: blur(1px);
-    }
-    
     /* WhatsApp & Telegram Icons - Floating */
     .contact-icons {
         position: fixed;
@@ -209,9 +169,44 @@ st.markdown("""
         opacity: 1;
     }
     
-    @keyframes floatUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+    .profit-positive {
+        color: #00C853;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+    }
+    .profit-negative {
+        color: #FF5252;
+        font-weight: bold;
+    }
+    .pending-alert {
+        background-color: #FFF3CD;
+        border: 1px solid #FFEEBA;
+        padding: 1rem;
+        border-radius: 5px;
+        margin: 0.5rem 0;
+        animation: fadeIn 0.5s;
+    }
+    .success-message {
+        animation: slideIn 0.5s, fadeOut 2s 3s forwards;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    /* Footer for copyright (from Code 2) */
+    .copyright-footer {
+        position: fixed;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 5px;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        backdrop-filter: blur(1px);
     }
     
     /* Animations */
@@ -236,42 +231,21 @@ st.markdown("""
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
+    @keyframes floatUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Add copyright footer (from Code 2)
+# Add copyright footer (from Code 2) - Keep this at the top
 st.markdown("""
 <div class="copyright-footer">
     © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
 </div>
 """, unsafe_allow_html=True)
 
-# Add WhatsApp & Telegram Icons - FLOATING
-st.markdown("""
-<!-- WhatsApp & Telegram Floating Icons -->
-<div class="contact-icons">
-    <!-- WhatsApp Icon -->
-    <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
-       target="_blank" style="text-decoration: none;">
-        <div class="icon-circle whatsapp-icon">
-            <i class="fab fa-whatsapp"></i>
-            <span class="tooltip">Chat on WhatsApp</span>
-        </div>
-    </a>
-    
-    <!-- Telegram Icon -->
-    <a href="https://t.me/Niceguy2310" 
-       target="_blank" style="text-decoration: none;">
-        <div class="icon-circle telegram-icon">
-            <i class="fab fa-telegram-plane"></i>
-            <span class="tooltip">Message on Telegram</span>
-        </div>
-    </a>
-</div>
-
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-""", unsafe_allow_html=True)
+# REMOVE THE ICONS FROM HERE - THEY SHOULD BE AT THE BOTTOM
 
 @st.cache_data(ttl=300)
 def load_excel_data():
@@ -737,6 +711,33 @@ def main():
     
     else:
         st.error("Could not load user metrics. Please try again.")
+
+    # ADD THE ICONS HERE - AT THE VERY END OF THE main() FUNCTION
+    st.markdown("""
+    <!-- WhatsApp & Telegram Floating Icons -->
+    <div class="contact-icons">
+        <!-- WhatsApp Icon -->
+        <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
+           target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+            <div class="icon-circle whatsapp-icon">
+                <i class="fab fa-whatsapp"></i>
+                <span class="tooltip">Chat on WhatsApp</span>
+            </div>
+        </a>
+        
+        <!-- Telegram Icon -->
+        <a href="https://t.me/Niceguy2310" 
+           target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+            <div class="icon-circle telegram-icon">
+                <i class="fab fa-telegram-plane"></i>
+                <span class="tooltip">Message on Telegram</span>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
