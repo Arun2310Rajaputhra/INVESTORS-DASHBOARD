@@ -140,6 +140,80 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* WhatsApp & Telegram Icons - Floating */
+    .contact-icons {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 9999;
+    }
+    
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: floatUp 0.5s ease-out;
+        position: relative;
+    }
+    
+    .whatsapp-icon {
+        background: linear-gradient(135deg, #25D366, #128C7E);
+    }
+    
+    .telegram-icon {
+        background: linear-gradient(135deg, #0088cc, #34AADF);
+    }
+    
+    .icon-circle:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    
+    .icon-circle:active {
+        transform: scale(0.95);
+    }
+    
+    .icon-circle i {
+        font-size: 30px;
+        color: white;
+    }
+    
+    .tooltip {
+        position: absolute;
+        right: 70px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+    
+    .icon-circle:hover .tooltip {
+        opacity: 1;
+    }
+    
+    @keyframes floatUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -170,6 +244,33 @@ st.markdown("""
 <div class="copyright-footer">
     © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
 </div>
+""", unsafe_allow_html=True)
+
+# Add WhatsApp & Telegram Icons - FLOATING
+st.markdown("""
+<!-- WhatsApp & Telegram Floating Icons -->
+<div class="contact-icons">
+    <!-- WhatsApp Icon -->
+    <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
+       target="_blank" style="text-decoration: none;">
+        <div class="icon-circle whatsapp-icon">
+            <i class="fab fa-whatsapp"></i>
+            <span class="tooltip">Chat on WhatsApp</span>
+        </div>
+    </a>
+    
+    <!-- Telegram Icon -->
+    <a href="https://t.me/Niceguy2310" 
+       target="_blank" style="text-decoration: none;">
+        <div class="icon-circle telegram-icon">
+            <i class="fab fa-telegram-plane"></i>
+            <span class="tooltip">Message on Telegram</span>
+        </div>
+    </a>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=300)
