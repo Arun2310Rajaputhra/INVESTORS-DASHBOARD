@@ -249,12 +249,12 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Add icons IMMEDIATELY - Using st.components to make them persistent
+# Add icons IMMEDIATELY - WORKING LINKS
 st.markdown("""
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="contact-icons">
-    <!-- WhatsApp Icon -->
+    <!-- WhatsApp Icon - WORKING LINK -->
     <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
        target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
         <div class="icon-circle whatsapp-icon">
@@ -263,9 +263,10 @@ st.markdown("""
         </div>
     </a>
     
-    <!-- Telegram Icon -->
-    <a href="https://t.me/Niceguy2310" 
-       target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+    <!-- Telegram Icon - WORKING LINK (Opens Telegram app if installed, else web) -->
+    <a href="tg://resolve?domain=niceguy2310" 
+       onclick="window.open('https://t.me/niceguy2310', '_blank'); return false;"
+       style="text-decoration: none;" rel="noopener noreferrer">
         <div class="icon-circle telegram-icon">
             <i class="fab fa-telegram-plane"></i>
             <span class="tooltip">Message on Telegram</span>
