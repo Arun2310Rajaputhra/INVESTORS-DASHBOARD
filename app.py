@@ -15,11 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize session state for icons
-if 'show_icons' not in st.session_state:
-    st.session_state.show_icons = True
-
-# Custom CSS with animations - MUST BE AT VERY TOP
+# Custom CSS with animations
 st.markdown("""
 <style>
     /* Background image */
@@ -104,18 +100,15 @@ st.markdown("""
         100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
     }
     
-    /* WhatsApp & Telegram Icons - FIXED POSITION */
-    .contact-icons {
+    /* WhatsApp Icon - FIXED POSITION */
+    .whatsapp-float {
         position: fixed;
         bottom: 80px;
         right: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
         z-index: 9999;
     }
     
-    .icon-circle {
+    .whatsapp-icon-circle {
         width: 60px;
         height: 60px;
         border-radius: 50%;
@@ -127,31 +120,24 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         animation: floatUp 0.5s ease-out;
         position: relative;
-    }
-    
-    .whatsapp-icon {
         background: linear-gradient(135deg, #25D366, #128C7E);
     }
     
-    .telegram-icon {
-        background: linear-gradient(135deg, #0088cc, #34AADF);
-    }
-    
-    .icon-circle:hover {
+    .whatsapp-icon-circle:hover {
         transform: scale(1.1) translateY(-5px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
     
-    .icon-circle:active {
+    .whatsapp-icon-circle:active {
         transform: scale(0.95);
     }
     
-    .icon-circle i {
+    .whatsapp-icon-circle i {
         font-size: 30px;
         color: white;
     }
     
-    .tooltip {
+    .whatsapp-tooltip {
         position: absolute;
         right: 70px;
         top: 50%;
@@ -169,7 +155,7 @@ st.markdown("""
         box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
     
-    .icon-circle:hover .tooltip {
+    .whatsapp-icon-circle:hover .whatsapp-tooltip {
         opacity: 1;
     }
     
@@ -249,33 +235,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Add icons IMMEDIATELY - WORKING LINKS
+# Add WhatsApp Icon - SINGLE ICON
 st.markdown("""
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<div class="contact-icons">
-    <!-- WhatsApp Icon - WORKING LINK -->
+<div class="whatsapp-float">
+    <!-- WhatsApp Icon Only -->
     <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
        target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
-        <div class="icon-circle whatsapp-icon">
+        <div class="whatsapp-icon-circle">
             <i class="fab fa-whatsapp"></i>
-            <span class="tooltip">Chat on WhatsApp</span>
-        </div>
-    </a>
-    
-    <!-- Telegram Icon - WORKING LINK (Opens Telegram app if installed, else web) -->
-    <a href="tg://resolve?domain=niceguy2310" 
-       onclick="window.open('https://t.me/niceguy2310', '_blank'); return false;"
-       style="text-decoration: none;" rel="noopener noreferrer">
-        <div class="icon-circle telegram-icon">
-            <i class="fab fa-telegram-plane"></i>
-            <span class="tooltip">Message on Telegram</span>
+            <span class="whatsapp-tooltip">Chat on WhatsApp</span>
         </div>
     </a>
 </div>
 """, unsafe_allow_html=True)
 
-# =========== REST OF YOUR CODE STARTS HERE ===========
 @st.cache_data(ttl=300)
 def load_excel_data():
     """Load all sheets from the Excel file"""
