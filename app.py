@@ -15,7 +15,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with animations - Keep this at the top
+# Initialize session state for icons
+if 'show_icons' not in st.session_state:
+    st.session_state.show_icons = True
+
+# Custom CSS with animations - MUST BE AT VERY TOP
 st.markdown("""
 <style>
     /* Background image */
@@ -100,7 +104,7 @@ st.markdown("""
         100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
     }
     
-    /* WhatsApp & Telegram Icons - Floating */
+    /* WhatsApp & Telegram Icons - FIXED POSITION */
     .contact-icons {
         position: fixed;
         bottom: 80px;
@@ -205,7 +209,7 @@ st.markdown("""
         color: rgba(255, 255, 255, 0.6);
         padding: 5px;
         background-color: rgba(0, 0, 0, 0.3);
-        z-index: 1000;
+        z-index: 9998;
         backdrop-filter: blur(1px);
     }
     
@@ -238,15 +242,39 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Add copyright footer (from Code 2) - Keep this at the top
+# Add copyright footer
 st.markdown("""
 <div class="copyright-footer">
     © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
 </div>
 """, unsafe_allow_html=True)
 
-# REMOVE THE ICONS FROM HERE - THEY SHOULD BE AT THE BOTTOM
+# Add icons IMMEDIATELY - Using st.components to make them persistent
+st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+<div class="contact-icons">
+    <!-- WhatsApp Icon -->
+    <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
+       target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+        <div class="icon-circle whatsapp-icon">
+            <i class="fab fa-whatsapp"></i>
+            <span class="tooltip">Chat on WhatsApp</span>
+        </div>
+    </a>
+    
+    <!-- Telegram Icon -->
+    <a href="https://t.me/Niceguy2310" 
+       target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+        <div class="icon-circle telegram-icon">
+            <i class="fab fa-telegram-plane"></i>
+            <span class="tooltip">Message on Telegram</span>
+        </div>
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
+# =========== REST OF YOUR CODE STARTS HERE ===========
 @st.cache_data(ttl=300)
 def load_excel_data():
     """Load all sheets from the Excel file"""
@@ -711,33 +739,6 @@ def main():
     
     else:
         st.error("Could not load user metrics. Please try again.")
-
-    # ADD THE ICONS HERE - AT THE VERY END OF THE main() FUNCTION
-    st.markdown("""
-    <!-- WhatsApp & Telegram Floating Icons -->
-    <div class="contact-icons">
-        <!-- WhatsApp Icon -->
-        <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
-           target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
-            <div class="icon-circle whatsapp-icon">
-                <i class="fab fa-whatsapp"></i>
-                <span class="tooltip">Chat on WhatsApp</span>
-            </div>
-        </a>
-        
-        <!-- Telegram Icon -->
-        <a href="https://t.me/Niceguy2310" 
-           target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
-            <div class="icon-circle telegram-icon">
-                <i class="fab fa-telegram-plane"></i>
-                <span class="tooltip">Message on Telegram</span>
-            </div>
-        </a>
-    </div>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
