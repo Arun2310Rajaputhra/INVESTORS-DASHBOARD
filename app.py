@@ -71,6 +71,17 @@ st.markdown("""
         background-color: rgba(0, 31, 63, 0.65); /* Slightly more opaque on hover */
     }
     
+    /* Light Red Color for Subheadings */
+    .light-red-heading {
+        color: #FF6B6B; /* Light Red Color */
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+        animation: fadeIn 0.8s;
+    }
+    
     .profit-positive {
         color: #00C853;
         font-weight: bold;
@@ -432,8 +443,8 @@ def main():
                 </div>
             </div>""", unsafe_allow_html=True)
         
-        # Key Metrics in columns
-        st.subheader("📈 Investment Overview")
+        # Key Metrics in columns - With Light Red Heading
+        st.markdown('<div class="light-red-heading">📈 Investment Overview</div>', unsafe_allow_html=True)
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -473,7 +484,7 @@ def main():
             """, unsafe_allow_html=True)
         
         # Company Profit Graph - Using transparent style from Code 2
-        st.subheader("📊 Company Profit Trend")
+        st.markdown('<div class="light-red-heading">📊 Company Profit Trend</div>', unsafe_allow_html=True)
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
             # Wrap plotly chart in a transparent container from Code 2
@@ -484,7 +495,7 @@ def main():
             st.info("No profit data available for graph.")
         
         # Filtered Data Table
-        st.subheader("📋 Your Profit Details")
+        st.markdown('<div class="light-red-heading">📋 Your Profit Details</div>', unsafe_allow_html=True)
         
         # Get filtered data
         filtered_data = create_user_profit_table(
@@ -546,7 +557,7 @@ def main():
             st.info("No data found for the selected filters.")
         
         # Investment History
-        st.subheader("💰 Your Investment History")
+        st.markdown('<div class="light-red-heading">💰 Your Investment History</div>', unsafe_allow_html=True)
         if metrics['investment_history']:
             invest_df = pd.DataFrame(metrics['investment_history'])
             st.dataframe(
@@ -578,8 +589,8 @@ def main():
         else:
             st.success("✅ All platform charges are cleared!")
         
-        # Additional Insights
-        st.subheader("📊 Additional Insights")
+        # Additional Insights - With Light Red Heading
+        st.markdown('<div class="light-red-heading">📊 Additional Insights</div>', unsafe_allow_html=True)
         
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
