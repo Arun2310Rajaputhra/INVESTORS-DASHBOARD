@@ -82,6 +82,24 @@ st.markdown("""
         animation: fadeIn 0.8s;
     }
     
+    /* BRIGHT SHINING RED for Platform Charges Status */
+    .bright-red-heading {
+        color: #FF0000 !important; /* Bright Shining Red */
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 0, 0, 0.5);
+        animation: fadeIn 0.8s, pulseBright 2s infinite;
+        text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+    }
+    
+    @keyframes pulseBright {
+        0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+        50% { text-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
+        100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+    }
+    
     .profit-positive {
         color: #00C853;
         font-weight: bold;
@@ -572,8 +590,8 @@ def main():
         else:
             st.info("No investment history found.")
         
-        # Pending Charges
-        st.subheader("⚠️ Platform Charges Status")
+        # Platform Charges Status - With BRIGHT SHINING RED Color
+        st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
         if metrics['pending_charges']:
             for charge in metrics['pending_charges']:
                 st.markdown(f"""
