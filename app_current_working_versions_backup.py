@@ -71,6 +71,94 @@ st.markdown("""
         background-color: rgba(0, 31, 63, 0.65); /* Slightly more opaque on hover */
     }
     
+    /* Light Red Color for Subheadings */
+    .light-red-heading {
+        color: #FF6B6B; /* Light Red Color */
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+        animation: fadeIn 0.8s;
+    }
+    
+    /* BRIGHT SHINING RED for Platform Charges Status */
+    .bright-red-heading {
+        color: #FF0000 !important; /* Bright Shining Red */
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 0, 0, 0.5);
+        animation: fadeIn 0.8s, pulseBright 2s infinite;
+        text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+    }
+    
+    @keyframes pulseBright {
+        0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+        50% { text-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
+        100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+    }
+    
+    /* WhatsApp Icon - FIXED POSITION */
+    .whatsapp-float {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .whatsapp-icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: floatUp 0.5s ease-out;
+        position: relative;
+        background: linear-gradient(135deg, #25D366, #128C7E);
+    }
+    
+    .whatsapp-icon-circle:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    
+    .whatsapp-icon-circle:active {
+        transform: scale(0.95);
+    }
+    
+    .whatsapp-icon-circle i {
+        font-size: 30px;
+        color: white;
+    }
+    
+    .whatsapp-tooltip {
+        position: absolute;
+        right: 70px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+    
+    .whatsapp-icon-circle:hover .whatsapp-tooltip {
+        opacity: 1;
+    }
+    
     .profit-positive {
         color: #00C853;
         font-weight: bold;
@@ -107,7 +195,7 @@ st.markdown("""
         color: rgba(255, 255, 255, 0.6);
         padding: 5px;
         background-color: rgba(0, 0, 0, 0.3);
-        z-index: 1000;
+        z-index: 9998;
         backdrop-filter: blur(1px);
     }
     
@@ -133,13 +221,33 @@ st.markdown("""
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
+    @keyframes floatUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Add copyright footer (from Code 2)
+# Add copyright footer
 st.markdown("""
 <div class="copyright-footer">
     © Copyright 2025. All rights reserved with Rajaputra Arun Kumar, Hyderabad
+</div>
+""", unsafe_allow_html=True)
+
+# Add WhatsApp Icon - SINGLE ICON
+st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="whatsapp-float">
+    <!-- WhatsApp Icon Only -->
+    <a href="https://wa.me/919398854605?text=Hello%20from%20Quantum%20Predictions%20Dashboard" 
+       target="_blank" style="text-decoration: none;" rel="noopener noreferrer">
+        <div class="whatsapp-icon-circle">
+            <i class="fab fa-whatsapp"></i>
+            <span class="whatsapp-tooltip">Chat on WhatsApp</span>
+        </div>
+    </a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -432,8 +540,8 @@ def main():
                 </div>
             </div>""", unsafe_allow_html=True)
         
-        # Key Metrics in columns
-        st.subheader("📈 Investment Overview")
+        # Key Metrics in columns - With Light Red Heading
+        st.markdown('<div class="light-red-heading">📈 Investment Overview</div>', unsafe_allow_html=True)
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -473,7 +581,7 @@ def main():
             """, unsafe_allow_html=True)
         
         # Company Profit Graph - Using transparent style from Code 2
-        st.subheader("📊 Company Profit Trend")
+        st.markdown('<div class="light-red-heading">📊 Company Profit Trend</div>', unsafe_allow_html=True)
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
             # Wrap plotly chart in a transparent container from Code 2
@@ -484,7 +592,7 @@ def main():
             st.info("No profit data available for graph.")
         
         # Filtered Data Table
-        st.subheader("📋 Your Profit Details")
+        st.markdown('<div class="light-red-heading">📋 Your Profit Details</div>', unsafe_allow_html=True)
         
         # Get filtered data
         filtered_data = create_user_profit_table(
@@ -546,7 +654,7 @@ def main():
             st.info("No data found for the selected filters.")
         
         # Investment History
-        st.subheader("💰 Your Investment History")
+        st.markdown('<div class="light-red-heading">💰 Your Investment History</div>', unsafe_allow_html=True)
         if metrics['investment_history']:
             invest_df = pd.DataFrame(metrics['investment_history'])
             st.dataframe(
@@ -561,8 +669,8 @@ def main():
         else:
             st.info("No investment history found.")
         
-        # Pending Charges
-        st.subheader("⚠️ Platform Charges Status")
+        # Platform Charges Status - With BRIGHT SHINING RED Color
+        st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
         if metrics['pending_charges']:
             for charge in metrics['pending_charges']:
                 st.markdown(f"""
@@ -578,8 +686,8 @@ def main():
         else:
             st.success("✅ All platform charges are cleared!")
         
-        # Additional Insights
-        st.subheader("📊 Additional Insights")
+        # Additional Insights - With Light Red Heading
+        st.markdown('<div class="light-red-heading">📊 Additional Insights</div>', unsafe_allow_html=True)
         
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
