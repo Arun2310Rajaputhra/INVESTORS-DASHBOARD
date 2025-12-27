@@ -412,6 +412,135 @@ def create_company_profit_graph(data):
     
     return fig
 
+def create_investment_vs_profit_chart(data, selected_user=None):
+    """Create candle-type vertical bar chart for investment vs profit"""
+    investor_df = data.get('Investor_Details', pd.DataFrame())
+    
+    if investor_df.empty:
+        return None
+    
+    # Prepare data for all users or specific user
+    if selected_user:
+        investor_df = investor_df[investor_df['UserID'] == selected_user]
+        if investor_df.empty:
+            return None
+    
+    # Sort by total investment (descending) for better visualization
+    investor_df = investor_df.sort_values('Total_Invested_Amount', ascending=False)
+    
+    # Get top 10 users if too many
+    if len(investor_df) > 10 and not selected_user:
+        investor_df = investor_df.head(10)
+    
+    # Create figure
+    fig = go.Figure()
+    
+    # Add Investment bars (base)
+    fig.add_trace(go.Bar(
+        x=investor_df['Name'] if 'Name' in investor_df.columns else investor_df['Contact_Name'],
+        y=investor_df['Total_Invested_Amount'],
+        name='Total Investment',
+        marker_color='#1E88E5',  # Blue
+        opacity=0.8,
+        width=0.4,
+        offset=-0.2,  # Position to left
+        text=[f'₹{x:,.0f}' for x in investor_df['Total_Invested_Amount']],
+        textposition='auto',
+        hovertext=[
+            f"<b>{name}</b><br>" +
+            f"Investment: ₹{inv:,.2f}<br>" +
+            f"Profit: ₹{profit:,.2f}<br>" +
+            f"ROI: {roi:.1f}%"
+            for name, inv, profit, roi in zip(
+                investor_df['Name'] if 'Name' in investor_df.columns else investor_df['Contact_Name'],
+                investor_df['Total_Invested_Amount'],
+                investor_df['Total Profit Earned'] if 'Total Profit Earned' in investor_df.columns else [0]*len(investor_df),
+                (investor_df['Total Profit Earned'] / investor_df['Total_Invested_Amount'] * 100) if 'Total Profit Earned' in investor_df.columns else [0]*len(investor_df)
+            )
+        ],
+        hoverinfo='text'
+    ))
+    
+    # Add Profit bars (on top)
+    profit_column = 'Total Profit Earned' if 'Total Profit Earned' in investor_df.columns else 'Total Profit'
+    
+    # Determine profit colors (green for positive, red for negative)
+    profit_colors = []
+    for profit in investor_df[profit_column]:
+        if profit >= 0:
+            profit_colors.append('#00C853')  # Green
+        else:
+            profit_colors.append('#FF5252')  # Red
+    
+    fig.add_trace(go.Bar(
+        x=investor_df['Name'] if 'Name' in investor_df.columns else investor_df['Contact_Name'],
+        y=investor_df[profit_column],
+        name='Total Profit',
+        marker_color=profit_colors,
+        opacity=0.8,
+        width=0.4,
+        offset=0.2,  # Position to right
+        text=[f'₹{x:,.0f}' for x in investor_df[profit_column]],
+        textposition='auto',
+        hovertext=[
+            f"<b>{name}</b><br>" +
+            f"Investment: ₹{inv:,.2f}<br>" +
+            f"Profit: ₹{profit:,.2f}<br>" +
+            f"Status: {'Profit' if profit >= 0 else 'Loss'}<br>" +
+            f"ROI: {roi:.1f}%"
+            for name, inv, profit, roi in zip(
+                investor_df['Name'] if 'Name' in investor_df.columns else investor_df['Contact_Name'],
+                investor_df['Total_Invested_Amount'],
+                investor_df[profit_column],
+                (investor_df[profit_column] / investor_df['Total_Invested_Amount'] * 100)
+            )
+        ],
+        hoverinfo='text'
+    ))
+    
+    # Add connecting lines between bars (optional, creates candle effect)
+    for i, (inv, profit) in enumerate(zip(investor_df['Total_Invested_Amount'], investor_df[profit_column])):
+        # Add line from investment bar to profit bar
+        fig.add_shape(
+            type="line",
+            x0=i-0.1, x1=i+0.1,
+            y0=inv, y1=inv,
+            line=dict(color="rgba(255,255,255,0.3)", width=1),
+        )
+    
+    # Update layout
+    fig.update_layout(
+        title='📊 Investment vs Profit Analysis (Candle-Type Bars)',
+        xaxis_title='Investors',
+        yaxis_title='Amount (₹)',
+        barmode='group',
+        bargap=0.15,
+        bargroupgap=0.1,
+        hovermode='x unified',
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='white',
+        height=500 if selected_user else 600,
+        margin=dict(l=50, r=50, t=80, b=100)
+    )
+    
+    # Format y-axis with ₹ symbol
+    fig.update_yaxes(tickprefix='₹ ')
+    
+    # Rotate x-axis labels for better readability
+    fig.update_xaxes(tickangle=45)
+    
+    return fig
+
 def create_user_profit_table(user_id, data, selected_date=None, payment_status=None):
     """Create filtered profit table for user"""
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
@@ -579,6 +708,60 @@ def main():
                 <small>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
             </div>
             """, unsafe_allow_html=True)
+        
+        # Investment vs Profit Chart - Candle Type Bars (NEW ADDITION)
+        st.markdown('<div class="light-red-heading">💹 Investment vs Profit Analysis</div>', unsafe_allow_html=True)
+        
+        # Add toggle for viewing all users vs current user only
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            view_option = st.radio(
+                "View:",
+                ["Your Data Only", "Compare with Other Investors"],
+                horizontal=True,
+                label_visibility="collapsed"
+            )
+        
+        # Create chart based on selection
+        chart_type = "current" if view_option == "Your Data Only" else "all"
+        profit_chart = create_investment_vs_profit_chart(
+            data, 
+            selected_user if view_option == "Your Data Only" else None
+        )
+        
+        if profit_chart:
+            # Wrap in transparent container
+            st.markdown("<div class='plotly-container'>", unsafe_allow_html=True)
+            st.plotly_chart(profit_chart, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Add insights based on the chart
+            if view_option == "Your Data Only":
+                # Calculate user's specific metrics
+                user_metrics = calculate_user_metrics(selected_user, data)
+                if user_metrics:
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        profit_status = "✅ Profit" if user_metrics['total_profit'] >= 0 else "❌ Loss"
+                        st.metric("Current Status", profit_status)
+                    
+                    with col2:
+                        roi_color = "green" if user_metrics['roi'] >= 0 else "red"
+                        st.markdown(f"""
+                        <div style='text-align: center; padding: 10px; border-radius: 5px; border: 1px solid {roi_color};'>
+                            <h4 style='margin: 0; color: {roi_color};'>ROI</h4>
+                            <h2 style='margin: 0; color: {roi_color};'>{user_metrics['roi']:.2f}%</h2>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    with col3:
+                        efficiency = (user_metrics['total_profit'] / user_metrics['total_investment']) if user_metrics['total_investment'] > 0 else 0
+                        efficiency_text = "High" if efficiency > 0.1 else "Medium" if efficiency > 0 else "Low"
+                        st.metric("Investment Efficiency", efficiency_text)
+            else:
+                st.info("💡 **Tip:** Compare your investment performance with other investors. Hover over bars to see detailed metrics.")
+        else:
+            st.info("No data available for the investment vs profit chart.")
         
         # Company Profit Graph - Using transparent style from Code 2
         st.markdown('<div class="light-red-heading">📊 Company Profit Trend</div>', unsafe_allow_html=True)
