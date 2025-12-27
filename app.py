@@ -859,7 +859,7 @@ def main():
             st.metric("Total Company Profit", f"₹{total_company_profit:,.2f}")
     
     else:
-        st.error("Could not load user metrics. Please try again.")
+        st.error("Could not load user metrics. Please try again..")
 
 if __name__ == "__main__":
     main()
