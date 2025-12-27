@@ -199,6 +199,17 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* NEW: Candle Bar Chart Container */
+    .candle-chart-container {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(2px);
+        animation: fadeIn 1s;
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -373,6 +384,120 @@ def calculate_user_metrics(user_id, data):
     metrics['pending_charges'] = pending_charges
     
     return metrics
+
+def create_investment_profit_candle_chart(total_investment, total_profit, user_id):
+    """Create candle-style vertical bar chart for investment vs profit"""
+    fig = go.Figure()
+    
+    # Define categories for x-axis
+    categories = []
+    investment_values = []
+    profit_values = []
+    
+    # Always add investment bar
+    categories.append('Total Investment')
+    investment_values.append(total_investment)
+    
+    # Add profit bar only if positive
+    if total_profit > 0:
+        categories.append('Total Profit')
+        profit_values.append(total_profit)
+    
+    # Create bars
+    if total_investment > 0:
+        fig.add_trace(go.Bar(
+            x=['Total Investment'],
+            y=[total_investment],
+            name='Total Investment',
+            marker_color='#1E88E5',  # Blue
+            marker_line_color='#0D47A1',  # Darker blue border
+            marker_line_width=2,
+            width=0.5,  # Thick candle-like bar
+            text=[f'₹{total_investment:,.0f}'],
+            textposition='outside',
+            textfont=dict(size=14, color='white'),
+            hoverinfo='y+name',
+            hovertemplate='<b>%{x}</b><br>Amount: ₹%{y:,.0f}<extra></extra>'
+        ))
+    
+    if total_profit > 0:
+        fig.add_trace(go.Bar(
+            x=['Total Profit'],
+            y=[total_profit],
+            name='Total Profit',
+            marker_color='#00C853',  # Green
+            marker_line_color='#00796B',  # Darker green border
+            marker_line_width=2,
+            width=0.5,  # Same thickness as investment bar
+            text=[f'₹{total_profit:,.0f}'],
+            textposition='outside',
+            textfont=dict(size=14, color='white'),
+            hoverinfo='y+name',
+            hovertemplate='<b>%{x}</b><br>Amount: ₹%{y:,.0f}<extra></extra>'
+        ))
+    
+    # Calculate y-axis range
+    max_value = max(total_investment, total_profit) if total_profit > 0 else total_investment
+    y_max = max_value * 1.15  # Add 15% padding
+    
+    # Update layout for candle-style appearance
+    fig.update_layout(
+        title=dict(
+            text='📊 Investment vs Profit Comparison',
+            font=dict(size=18, color='white'),
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis=dict(
+            title='',
+            tickfont=dict(size=14, color='white'),
+            showgrid=False
+        ),
+        yaxis=dict(
+            title='Amount (₹)',
+            titlefont=dict(size=14, color='white'),
+            tickfont=dict(size=12, color='white'),
+            tickformat=',.0f',
+            gridcolor='rgba(255, 255, 255, 0.1)',
+            zerolinecolor='rgba(255, 255, 255, 0.2)',
+            range=[0, y_max]
+        ),
+        showlegend=False,
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='white',
+        height=500,
+        margin=dict(t=60, b=100, l=80, r=40),  # Extra bottom margin for user ID
+        bargap=0.3,  # Space between bars
+        bargroupgap=0.1,
+        hoverlabel=dict(
+            bgcolor='rgba(0, 0, 0, 0.8)',
+            font_size=14,
+            font_color='white'
+        )
+    )
+    
+    # Add user ID annotation at the bottom (like in your image reference)
+    fig.add_annotation(
+        x=0.5,
+        y=-0.15,
+        xref="paper",
+        yref="paper",
+        text=f"User ID: {user_id}",
+        showarrow=False,
+        font=dict(size=14, color="white", family="Arial, sans-serif"),
+        bgcolor="rgba(0, 0, 0, 0.5)",
+        bordercolor="rgba(255, 255, 255, 0.2)",
+        borderwidth=1,
+        borderpad=4,
+        opacity=0.8
+    )
+    
+    # Add horizontal grid lines
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255, 255, 255, 0.1)')
+    
+    return fig
 
 def create_company_profit_graph(data):
     """Create company profit graph (excluding negatives) with transparent style from Code 2"""
@@ -580,8 +705,28 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         
+        # NEW: Investment vs Profit Candle Bar Chart
+        st.markdown('<div class="light-red-heading">📊 Investment vs Profit Comparison</div>', unsafe_allow_html=True)
+        
+        # Create the candle bar chart
+        candle_chart = create_investment_profit_candle_chart(
+            total_investment=metrics['total_investment'],
+            total_profit=metrics['total_profit'],
+            user_id=metrics['user_id']
+        )
+        
+        # Display the chart in a styled container
+        st.markdown("<div class='candle-chart-container'>", unsafe_allow_html=True)
+        st.plotly_chart(candle_chart, use_container_width=True)
+        
+        # Add explanation note
+        if metrics['total_profit'] <= 0:
+            st.info("💡 Note: Profit bar is not shown as your current profit is not positive.")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
         # Company Profit Graph - Using transparent style from Code 2
-        st.markdown('<div class="light-red-heading">📊 Company Profit Trend</div>', unsafe_allow_html=True)
+        st.markdown('<div class="light-red-heading">📈 Company Profit Trend</div>', unsafe_allow_html=True)
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
             # Wrap plotly chart in a transparent container from Code 2
