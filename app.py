@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 import numpy as np
 import os
 import time
-import requests
-from io import StringIO
 
 # Page configuration
 st.set_page_config(
@@ -17,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with animations and new styles
+# Custom CSS with animations
 st.markdown("""
 <style>
     /* Background image */
@@ -47,139 +45,74 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
-    /* MARQUEE SCROLLING TEXT STYLES */
-    .marquee-container {
-        width: 100%;
-        overflow: hidden;
-        background-color: rgba(0, 0, 0, 0.7);
-        padding: 8px 0;
-        margin-bottom: 10px;
-        border-bottom: 2px solid rgba(255, 255, 0, 0.3);
-        position: relative;
-    }
-    
-    .marquee-content {
-        display: inline-block;
-        white-space: nowrap;
-        position: relative;
-    }
-    
-    .marquee-text {
-        color: #FFFF00 !important; /* Yellow color */
-        font-size: 14px;
-        font-weight: 500;
-        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
-        display: inline-block;
-        padding-left: 100%;
-    }
-    
-    /* TERMS & CONDITIONS MODAL STYLES */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.85);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 99999;
-        animation: fadeIn 0.5s ease-out;
-    }
-    
-    .modal-content {
-        background: linear-gradient(135deg, rgba(0, 31, 63, 0.95), rgba(0, 20, 40, 0.95));
-        border-radius: 15px;
-        padding: 2rem;
-        width: 80%;
-        max-width: 800px;
-        max-height: 80vh;
-        overflow-y: auto;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        animation: slideUp 0.5s ease-out;
-    }
-    
-    .modal-header {
-        color: #FF6B6B;
-        font-size: 1.8rem;
-        font-weight: 700;
+    /* Animated Top Text */
+    .top-animated-text {
         text-align: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid rgba(255, 107, 107, 0.3);
-    }
-    
-    .modal-body {
-        color: #FFFFFF;
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 2rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 1.5rem;
+        color: #FFFF00; /* Yellow color */
+        font-size: 16px;
+        font-weight: 500;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        padding: 8px 15px;
+        background-color: rgba(0, 0, 0, 0.7);
         border-radius: 8px;
-        max-height: 50vh;
-        overflow-y: auto;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 0, 0.3);
+        animation: fadeIn 1.5s ease-out;
+        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
     }
     
-    .modal-footer {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-top: 1.5rem;
+    /* Terms & Conditions Section */
+    .terms-section {
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .agree-button {
-        background: linear-gradient(135deg, #00C853, #00E676);
+    .terms-toggle {
+        background-color: rgba(0, 31, 63, 0.8);
         color: white;
-        border: none;
-        padding: 12px 40px;
-        border-radius: 8px;
+        padding: 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
         font-size: 16px;
         font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
     }
     
-    .agree-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 200, 83, 0.5);
-        background: linear-gradient(135deg, #00E676, #00C853);
+    .terms-toggle:hover {
+        background-color: rgba(0, 41, 83, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
-    .agree-button:active {
-        transform: translateY(0);
+    .terms-content {
+        background-color: rgba(0, 31, 63, 0.7);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: fadeIn 0.5s ease-out;
+        font-size: 14px;
+        line-height: 1.6;
     }
     
-    /* Terms & Conditions text styling */
-    .terms-text {
-        font-family: 'Arial', sans-serif;
+    .language-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
     }
     
-    .terms-text h3 {
+    .language-title {
         color: #4FC3F7;
-        margin-top: 1.2rem;
-        margin-bottom: 0.5rem;
-        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 15px;
     }
     
-    .terms-text p {
-        margin-bottom: 0.8rem;
-    }
-    
-    .terms-text ul {
-        margin-left: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .terms-text li {
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Main header */
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
@@ -304,7 +237,7 @@ st.markdown("""
         font-weight: bold;
     }
     .pending-alert {
-        background-color: rgba(255, 243, 205, 0.9);
+        background-color: #FFF3CD;
         border: 1px solid #FFEEBA;
         padding: 1rem;
         border-radius: 5px;
@@ -340,7 +273,7 @@ st.markdown("""
         to { opacity: 1; }
     }
     @keyframes slideUp {
-        from { transform: translateY(30px); opacity: 0; }
+        from { transform: translateY(20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
     @keyframes slideIn {
@@ -361,44 +294,6 @@ st.markdown("""
         to { transform: translateY(0); opacity: 1; }
     }
 </style>
-""", unsafe_allow_html=True)
-
-# Add JavaScript for marquee scrolling
-st.markdown("""
-<script>
-// Marquee scrolling function
-function startMarquee() {
-    const marqueeContent = document.querySelector('.marquee-content');
-    const marqueeText = document.querySelector('.marquee-text');
-    
-    if (marqueeContent && marqueeText) {
-        // Get the text width
-        const textWidth = marqueeText.offsetWidth;
-        
-        // Create animation
-        let position = 0;
-        
-        function animate() {
-            position -= 1; // Speed of scroll
-            if (position < -textWidth) {
-                position = window.innerWidth; // Reset to right side
-            }
-            marqueeContent.style.transform = `translateX(${position}px)`;
-            requestAnimationFrame(animate);
-        }
-        
-        // Start animation
-        animate();
-    }
-}
-
-// Start marquee when page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startMarquee);
-} else {
-    startMarquee();
-}
-</script>
 """, unsafe_allow_html=True)
 
 # Add copyright footer
@@ -458,122 +353,100 @@ def load_excel_data():
                 time.sleep(0.5)
                 loading_placeholder.empty()
 
-@st.cache_data(ttl=300)
-def load_scrolling_text():
-    """Load scrolling text from Current_System sheet cell A1"""
-    try:
-        github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/INVESTMENT_APP_DETAILS_UPDATE.xlsx"
-        excel_data = pd.ExcelFile(github_url)
-        
-        # Check if Current_System sheet exists
-        if 'Current_System' in excel_data.sheet_names:
-            df = excel_data.parse('Current_System')
-            if not df.empty:
-                # Get text from cell A1 (first row, first column)
-                scrolling_text = str(df.iat[0, 0]) if pd.notna(df.iat[0, 0]) else "Important Updates Will Appear Here"
-                return scrolling_text
-        return "Important Updates Will Appear Here"
-    except Exception as e:
-        st.error(f"Error loading scrolling text: {str(e)}")
-        return "Important Updates Will Appear Here"
-
-@st.cache_data(ttl=300)
-def load_terms_and_conditions():
-    """Load Terms & Conditions from text file"""
-    try:
-        # GitHub raw URL for the text file
-        txt_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/Terms_And_Conditions.txt"
-        
-        # Download the file
-        response = requests.get(txt_url)
-        response.raise_for_status()
-        
-        # Return the content with UTF-8 decoding
-        return response.content.decode('utf-8')
-    except Exception as e:
-        st.error(f"Error loading Terms & Conditions: {str(e)}")
-        return """
-        TERMS AND CONDITIONS
-
-        1. Acceptance of Terms
-        By accessing and using this Quantum Predictions Dashboard, you agree to be bound by these Terms and Conditions.
-
-        2. Investment Risks
-        All investments carry risk. Past performance does not guarantee future results. You should only invest what you can afford to lose.
-
-        3. Data Accuracy
-        While we strive for accuracy, we cannot guarantee that all information displayed is complete, current, or error-free.
-
-        4. User Responsibility
-        You are responsible for maintaining the confidentiality of your login credentials and for all activities under your account.
-
-        5. Limitation of Liability
-        Quantum Predictions shall not be liable for any direct, indirect, incidental, or consequential damages resulting from your use of this dashboard.
-
-        6. Modifications
-        We reserve the right to modify these terms at any time. Continued use constitutes acceptance of modified terms.
-
-        7. Governing Law
-        These terms shall be governed by the laws of India, with jurisdiction in Hyderabad.
-
-        By clicking "I Agree", you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
-        """
-
-def display_terms_modal():
-    """Display Terms & Conditions modal if not agreed yet"""
-    # Check if user has already agreed
-    if 'terms_accepted' not in st.session_state:
-        st.session_state.terms_accepted = False
+def display_animated_top_text():
+    """Display animated text at the top"""
+    # The text to display
+    text = "Current System Is Running 11 Stages With 2 Loss Auto-Invest Activation"
     
-    # If not accepted, show modal
-    if not st.session_state.terms_accepted:
-        # Load terms content
-        terms_content = load_terms_and_conditions()
-        
-        # Create modal HTML
-        modal_html = f"""
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    📜 TERMS AND CONDITIONS
-                </div>
-                <div class="modal-body terms-text">
-                    {terms_content.replace(chr(10), '<br>').replace(chr(13), '')}
-                </div>
-                <div class="modal-footer">
-                    <button onclick="agreeToTerms()" class="agree-button">
-                        ✓ I HAVE READ AND AGREE TO THE TERMS & CONDITIONS
-                    </button>
+    # Create a container for the animated text
+    st.markdown(f"""
+    <div class="top-animated-text">
+        ⚡ {text} ⚡
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Add JavaScript for character-by-character animation
+    st.markdown("""
+    <script>
+    // Animate the text character by character
+    setTimeout(function() {
+        const textElement = document.querySelector('.top-animated-text');
+        if (textElement) {
+            const originalText = textElement.textContent;
+            textElement.textContent = '';
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < originalText.length) {
+                    textElement.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30); // Speed of typing
+                }
+            }
+            typeWriter();
+        }
+    }, 500);
+    </script>
+    """, unsafe_allow_html=True)
+
+def display_terms_and_conditions():
+    """Display Terms & Conditions section at the bottom"""
+    st.markdown('<div class="terms-section">', unsafe_allow_html=True)
+    
+    # Initialize session state for toggle
+    if 'show_terms' not in st.session_state:
+        st.session_state.show_terms = False
+    
+    # Toggle button
+    toggle_label = "📜 View Terms & Conditions" if not st.session_state.show_terms else "📜 Hide Terms & Conditions"
+    
+    # Use columns to center the button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button(toggle_label, use_container_width=True, key="terms_toggle"):
+            st.session_state.show_terms = not st.session_state.show_terms
+            st.rerun()
+    
+    # Display terms content if toggled
+    if st.session_state.show_terms:
+        st.markdown("""
+        <div class="terms-content">
+            <strong>Terms & Conditions*</strong><br><br>
+            
+            Our system is running with some strategy that you can check at the top of the website. 
+            Example: system if system is running with 11 stages with 2 loss Auto-Invest activation. It means our system will be stable upto 12 losses. 
+            13th loss then all our money will be loss. If we want more safe we can use 3 loss Auto-Invest activation. 
+            So it will be some more safer than 2 loss Auto-Invest activation. But, profit will be some lower than 2 loss Auto-Invest Activation. 
+            Being an AI Engineer I have developed the better prediction system by using Machine Learning models. 
+            Eventhough we should be consider the future losses if it may be happens. If you feel the system looks unstable and 
+            your money will not safe here, then you can always welcome to withdraw your funds and always welcoming back to the system again.
+            
+            <div class="language-section">
+                <div class="language-title">हिंदी (Hindi):</div>
+                हमारा system कुछ strategy के साथ चल रहा है जिसे आप वेबसाइट के शीर्ष पर देख सकते हैं। 
+                उदाहरण: system अगर 11 stages के साथ 2 loss Auto-Invest activation के साथ चल रहा है। 
+                इसका मतलब है कि हमारा system 12 losses तक stable रहेगा। 13वीं loss पर हमारा सारा पैसा loss हो जाएगा। 
+                अगर हम और safe रहना चाहते हैं तो 3 loss Auto-Invest activation का उपयोग कर सकते हैं। तो यह 2 loss Auto-Invest activation की तुलना में कुछ और safe होगा। 
+                लेकिन, profit 2 loss Auto-Invest activation की तुलना में कुछ कम होगा। 
+                एक AI Engineer होने के नाते मैंने Machine Learning models का उपयोग करके एक बेहतर prediction system विकसित किया है। 
+                फिर भी हमें भविष्य में होने वाली losses पर विचार करना चाहिए। अगर आपको लगता है कि system अस्थिर लग रहा है और 
+                आपको लगता है कि आपका पैसा यहाँ safe नहीं है, तो आप हमेशा अपने funds को withdraw करने के लिए स्वागत है और हमेशा system में वापस आने के लिए स्वागत है।
+                
+                <div class="language-section">
+                    <div class="language-title">తెలుగు (Telugu):</div>
+                    మా system కొన్ని strategy తో నడుస్తోంది, దాన్ని మీరు వెబ్‌సైట్ పైభాగంలో చూడవచ్చు. 
+                    ఉదాహరణ: system 11 stages తో 2 loss Auto-Invest activation తో నడుస్తున్నట్లయితే. దీని అర్థం మా system 12 losses వరకు stable గా ఉంటుంది. 
+                    13వ loss వచ్చినప్పుడు మా మొత్తం డబ్బు loss అవుతుంది. మనం మరింత safe గా ఉండాలనుకుంటే 3 loss Auto-Invest activation ఉపయోగించవచ్చు. 
+                    అప్పుడు ఇది 2 loss Auto-Invest activation కంటే కొంచెం మరింత safe గా ఉంటుంది. కానీ, profit 2 loss Auto-Invest activation కంటే కొంచెం తక్కువగా ఉంటుంది. 
+                    నేను ఒక AI Engineer గా Machine Learning models ఉపయోగించి మెరుగైన prediction system అభివృద్ధి చేశాను. 
+                    అయినా, భవిష్యత్తులో జరగవచ్చే losses గురించి మనం పరిగణలోకి తీసుకోవాలి. మీరు system అస్థిరంగా అనిపిస్తే, 
+                    మీ డబ్బు ఇక్కడ safe గా లేదని మీకు అనిపిస్తే, మీరు ఎప్పుడైనా మీ funds ను withdraw చేసుకోవడానికి స్వాగతం మరియు మళ్ళీ system లోకి తిరిగి రావడానికి ఎల్లప్పుడూ స్వాగతం.
                 </div>
             </div>
         </div>
-        
-        <script>
-        function agreeToTerms() {{
-            // Send agreement to Streamlit
-            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: 'agreed'}}, '*');
-        }}
-        
-        // Prevent closing with escape key
-        document.addEventListener('keydown', function(e) {{
-            if (e.key === 'Escape') {{
-                e.preventDefault();
-            }}
-        }});
-        </script>
-        """
-        
-        # Display the modal
-        st.markdown(modal_html, unsafe_allow_html=True)
-        
-        # Create a hidden component to capture the agreement
-        if st.button("", key="hidden_agree_button", type="secondary"):
-            st.session_state.terms_accepted = True
-            st.rerun()
-        
-        # Return False to indicate modal is showing
-        return False
-    return True
+        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def calculate_user_metrics(user_id, data):
     """Calculate all metrics for a specific user"""
@@ -866,76 +739,10 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    # Display Terms & Conditions Modal FIRST
-    # If user hasn't agreed, show modal and stop further execution
-    if not display_terms_modal():
-        # Create a placeholder to capture JavaScript events
-        st.markdown("""
-        <script>
-        // Listen for the agreement message from the modal
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'streamlit:setComponentValue' && event.data.value === 'agreed') {
-                // Trigger the Streamlit button click
-                const button = window.parent.document.querySelector('button[kind="secondary"]');
-                if (button) button.click();
-            }
-        });
-        </script>
-        """, unsafe_allow_html=True)
-        return  # Stop execution until user agrees
+    # Display animated text at the top
+    display_animated_top_text()
     
-    # Now display the scrolling text and main dashboard
-    # 1. LOAD AND DISPLAY SCROLLING TEXT
-    scrolling_text = load_scrolling_text()
-    
-    # Display marquee with scrolling text
-    st.markdown(f"""
-    <div class="marquee-container">
-        <div class="marquee-content">
-            <span class="marquee-text">⚡ {scrolling_text} ⚡</span>
-        </div>
-    </div>
-    
-    <script>
-    // Simple marquee animation
-    setTimeout(function() {{
-        const container = document.querySelector('.marquee-container');
-        const content = document.querySelector('.marquee-content');
-        const text = document.querySelector('.marquee-text');
-        
-        if (container && content && text) {{
-            const containerWidth = container.offsetWidth;
-            const textWidth = text.offsetWidth;
-            
-            // Duplicate text for seamless scrolling
-            content.innerHTML += ' ⚡ {scrolling_text} ⚡ ';
-            
-            // Calculate animation duration based on text length
-            const duration = textWidth / 50; // pixels per second
-            
-            // Apply animation
-            content.style.animation = `marquee ${{duration}}s linear infinite`;
-            
-            // Define the keyframes
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @keyframes marquee {{
-                    0% {{ transform: translateX(100%); }}
-                    100% {{ transform: translateX(-100%); }}
-                }}
-                .marquee-content {{
-                    display: inline-block;
-                    white-space: nowrap;
-                    animation: marquee ${{duration}}s linear infinite;
-                }}
-            `;
-            document.head.appendChild(style);
-        }}
-    }}, 100);
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # 2. MAIN DASHBOARD HEADER
+    # Main header with QUANTUM PREDICTIONS
     st.markdown("""
     <div style="text-align: center;">
         <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
@@ -1257,6 +1064,9 @@ def main():
     
     else:
         st.error("Could not load user metrics. Please try again.")
+    
+    # Display Terms & Conditions at the bottom
+    display_terms_and_conditions()
 
 if __name__ == "__main__":
     main()
