@@ -45,57 +45,26 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
-    /* Animated Top Text */
-    .top-animated-text {
+    /* Simple Top Text */
+    .top-text {
         text-align: center;
-        color: #FFFF00; /* Yellow color */
+        color: yellow;
         font-size: 16px;
         font-weight: 500;
         margin-top: 10px;
         margin-bottom: 30px;
-        padding: 8px 15px;
+        padding: 10px;
         background-color: rgba(0, 0, 0, 0.7);
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 0, 0.3);
-        animation: fadeIn 1.5s ease-out;
-        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+        border-radius: 5px;
     }
     
-    /* Terms & Conditions Section */
-    .terms-section {
+    /* Simple Bottom Text */
+    .bottom-text {
         margin-top: 50px;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .terms-toggle {
-        background-color: rgba(0, 31, 63, 0.8);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        cursor: pointer;
-        text-align: center;
-        margin-bottom: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-        font-size: 16px;
-        font-weight: 600;
-    }
-    
-    .terms-toggle:hover {
-        background-color: rgba(0, 41, 83, 0.9);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    .terms-content {
-        background-color: rgba(0, 31, 63, 0.7);
-        color: white;
         padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
         border-radius: 10px;
-        margin-top: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        animation: fadeIn 0.5s ease-out;
+        color: white;
         font-size: 14px;
         line-height: 1.6;
     }
@@ -103,69 +72,57 @@ st.markdown("""
     .language-section {
         margin-top: 15px;
         padding-top: 15px;
-        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        border-top: 1px dashed rgba(255, 255, 255, 0.2);
     }
     
     .language-title {
         color: #4FC3F7;
         font-weight: 600;
-        margin-bottom: 10px;
-        font-size: 15px;
+        margin-bottom: 5px;
     }
     
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
         margin-bottom: 1rem;
-        animation: fadeIn 1s;
     }
     
     /* GLASS EFFECT for Investment Overview metric cards ONLY */
     .metric-card {
-        background-color: rgba(0, 31, 63, 0.55); /* Changed to semi-transparent */
+        background-color: rgba(0, 31, 63, 0.55);
         color: white;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
-        animation: slideUp 0.5s ease-out;
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Added glass border */
-        backdrop-filter: blur(1px); /* Added glass blur effect */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(1px);
     }
     
     .metric-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        background-color: rgba(0, 31, 63, 0.65); /* Slightly more opaque on hover */
+        background-color: rgba(0, 31, 63, 0.65);
     }
     
     /* Light Red Color for Subheadings */
     .light-red-heading {
-        color: #FF6B6B; /* Light Red Color */
+        color: #FF6B6B;
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid rgba(255, 107, 107, 0.3);
-        animation: fadeIn 0.8s;
     }
     
     /* BRIGHT SHINING RED for Platform Charges Status */
     .bright-red-heading {
-        color: #FF0000 !important; /* Bright Shining Red */
+        color: #FF0000 !important;
         font-size: 1.5rem;
         font-weight: 700;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid rgba(255, 0, 0, 0.5);
-        animation: fadeIn 0.8s, pulseBright 2s infinite;
-        text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
-    }
-    
-    @keyframes pulseBright {
-        0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
-        50% { text-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
-        100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
     }
     
     /* WhatsApp Icon - FIXED POSITION */
@@ -186,7 +143,6 @@ st.markdown("""
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: floatUp 0.5s ease-out;
         position: relative;
         background: linear-gradient(135deg, #25D366, #128C7E);
     }
@@ -230,7 +186,6 @@ st.markdown("""
     .profit-positive {
         color: #00C853;
         font-weight: bold;
-        animation: pulse 2s infinite;
     }
     .profit-negative {
         color: #FF5252;
@@ -242,17 +197,9 @@ st.markdown("""
         padding: 1rem;
         border-radius: 5px;
         margin: 0.5rem 0;
-        animation: fadeIn 0.5s;
-    }
-    .success-message {
-        animation: slideIn 0.5s, fadeOut 2s 3s forwards;
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
     }
     
-    /* Footer for copyright (from Code 2) */
+    /* Footer for copyright */
     .copyright-footer {
         position: fixed;
         bottom: 10px;
@@ -265,33 +212,6 @@ st.markdown("""
         background-color: rgba(0, 0, 0, 0.3);
         z-index: 9998;
         backdrop-filter: blur(1px);
-    }
-    
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    @keyframes slideUp {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes slideIn {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
-    }
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    @keyframes floatUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -352,101 +272,6 @@ def load_excel_data():
             finally:
                 time.sleep(0.5)
                 loading_placeholder.empty()
-
-def display_animated_top_text():
-    """Display animated text at the top"""
-    # The text to display
-    text = "Current System Is Running 11 Stages With 2 Loss Auto-Invest Activation"
-    
-    # Create a container for the animated text
-    st.markdown(f"""
-    <div class="top-animated-text">
-        ⚡ {text} ⚡
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Add JavaScript for character-by-character animation
-    st.markdown("""
-    <script>
-    // Animate the text character by character
-    setTimeout(function() {
-        const textElement = document.querySelector('.top-animated-text');
-        if (textElement) {
-            const originalText = textElement.textContent;
-            textElement.textContent = '';
-            
-            let i = 0;
-            function typeWriter() {
-                if (i < originalText.length) {
-                    textElement.textContent += originalText.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 30); // Speed of typing
-                }
-            }
-            typeWriter();
-        }
-    }, 500);
-    </script>
-    """, unsafe_allow_html=True)
-
-def display_terms_and_conditions():
-    """Display Terms & Conditions section at the bottom"""
-    st.markdown('<div class="terms-section">', unsafe_allow_html=True)
-    
-    # Initialize session state for toggle
-    if 'show_terms' not in st.session_state:
-        st.session_state.show_terms = False
-    
-    # Toggle button
-    toggle_label = "📜 View Terms & Conditions" if not st.session_state.show_terms else "📜 Hide Terms & Conditions"
-    
-    # Use columns to center the button
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button(toggle_label, use_container_width=True, key="terms_toggle"):
-            st.session_state.show_terms = not st.session_state.show_terms
-            st.rerun()
-    
-    # Display terms content if toggled
-    if st.session_state.show_terms:
-        st.markdown("""
-        <div class="terms-content">
-            <strong>Terms & Conditions*</strong><br><br>
-            
-            Our system is running with some strategy that you can check at the top of the website. 
-            Example: system if system is running with 11 stages with 2 loss Auto-Invest activation. It means our system will be stable upto 12 losses. 
-            13th loss then all our money will be loss. If we want more safe we can use 3 loss Auto-Invest activation. 
-            So it will be some more safer than 2 loss Auto-Invest activation. But, profit will be some lower than 2 loss Auto-Invest Activation. 
-            Being an AI Engineer I have developed the better prediction system by using Machine Learning models. 
-            Eventhough we should be consider the future losses if it may be happens. If you feel the system looks unstable and 
-            your money will not safe here, then you can always welcome to withdraw your funds and always welcoming back to the system again.
-            
-            <div class="language-section">
-                <div class="language-title">हिंदी (Hindi):</div>
-                हमारा system कुछ strategy के साथ चल रहा है जिसे आप वेबसाइट के शीर्ष पर देख सकते हैं। 
-                उदाहरण: system अगर 11 stages के साथ 2 loss Auto-Invest activation के साथ चल रहा है। 
-                इसका मतलब है कि हमारा system 12 losses तक stable रहेगा। 13वीं loss पर हमारा सारा पैसा loss हो जाएगा। 
-                अगर हम और safe रहना चाहते हैं तो 3 loss Auto-Invest activation का उपयोग कर सकते हैं। तो यह 2 loss Auto-Invest activation की तुलना में कुछ और safe होगा। 
-                लेकिन, profit 2 loss Auto-Invest activation की तुलना में कुछ कम होगा। 
-                एक AI Engineer होने के नाते मैंने Machine Learning models का उपयोग करके एक बेहतर prediction system विकसित किया है। 
-                फिर भी हमें भविष्य में होने वाली losses पर विचार करना चाहिए। अगर आपको लगता है कि system अस्थिर लग रहा है और 
-                आपको लगता है कि आपका पैसा यहाँ safe नहीं है, तो आप हमेशा अपने funds को withdraw करने के लिए स्वागत है और हमेशा system में वापस आने के लिए स्वागत है।
-                
-                <div class="language-section">
-                    <div class="language-title">తెలుగు (Telugu):</div>
-                    మా system కొన్ని strategy తో నడుస్తోంది, దాన్ని మీరు వెబ్‌సైట్ పైభాగంలో చూడవచ్చు. 
-                    ఉదాహరణ: system 11 stages తో 2 loss Auto-Invest activation తో నడుస్తున్నట్లయితే. దీని అర్థం మా system 12 losses వరకు stable గా ఉంటుంది. 
-                    13వ loss వచ్చినప్పుడు మా మొత్తం డబ్బు loss అవుతుంది. మనం మరింత safe గా ఉండాలనుకుంటే 3 loss Auto-Invest activation ఉపయోగించవచ్చు. 
-                    అప్పుడు ఇది 2 loss Auto-Invest activation కంటే కొంచెం మరింత safe గా ఉంటుంది. కానీ, profit 2 loss Auto-Invest activation కంటే కొంచెం తక్కువగా ఉంటుంది. 
-                    నేను ఒక AI Engineer గా Machine Learning models ఉపయోగించి మెరుగైన prediction system అభివృద్ధి చేశాను. 
-                    అయినా, భవిష్యత్తులో జరగవచ్చే losses గురించి మనం పరిగణలోకి తీసుకోవాలి. మీరు system అస్థిరంగా అనిపిస్తే, 
-                    మీ డబ్బు ఇక్కడ safe గా లేదని మీకు అనిపిస్తే, మీరు ఎప్పుడైనా మీ funds ను withdraw చేసుకోవడానికి స్వాగతం మరియు మళ్ళీ system లోకి తిరిగి రావడానికి ఎల్లప్పుడూ స్వాగతం.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def calculate_user_metrics(user_id, data):
     """Calculate all metrics for a specific user"""
@@ -739,10 +564,14 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    # Display animated text at the top
-    display_animated_top_text()
+    # SIMPLE TOP TEXT
+    st.markdown("""
+    <div class="top-text">
+        ⚡ Current System Is Running 11 Stages With 2 Loss Auto-Invest Activation ⚡
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Main header with QUANTUM PREDICTIONS
+    # Main header
     st.markdown("""
     <div style="text-align: center;">
         <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
@@ -1065,8 +894,43 @@ def main():
     else:
         st.error("Could not load user metrics. Please try again.")
     
-    # Display Terms & Conditions at the bottom
-    display_terms_and_conditions()
+    # SIMPLE BOTTOM TEXT - Terms & Conditions
+    st.markdown("""
+    <div class="bottom-text">
+        <strong>Terms & Conditions*</strong><br><br>
+        
+        Our system is running with some strategy that you can check at the top of the website. 
+        Example: system if system is running with 11 stages with 2 loss Auto-Invest activation. It means our system will be stable upto 12 losses. 
+        13th loss then all our money will be loss. If we want more safe we can use 3 loss Auto-Invest activation. 
+        So it will be some more safer than 2 loss Auto-Invest activation. But, profit will be some lower than 2 loss Auto-Invest Activation. 
+        Being an AI Engineer I have developed the better prediction system by using Machine Learning models. 
+        Eventhough we should be consider the future losses if it may be happens. If you feel the system looks unstable and 
+        your money will not safe here, then you can always welcome to withdraw your funds and always welcoming back to the system again.
+        
+        <div class="language-section">
+            <div class="language-title">हिंदी (Hindi):</div>
+            हमारा system कुछ strategy के साथ चल रहा है जिसे आप वेबसाइट के शीर्ष पर देख सकते हैं। 
+            उदाहरण: system अगर 11 stages के साथ 2 loss Auto-Invest activation के साथ चल रहा है। 
+            इसका मतलब है कि हमारा system 12 losses तक stable रहेगा। 13वीं loss पर हमारा सारा पैसा loss हो जाएगा। 
+            अगर हम और safe रहना चाहते हैं तो 3 loss Auto-Invest activation का उपयोग कर सकते हैं। तो यह 2 loss Auto-Invest activation की तुलना में कुछ और safe होगा। 
+            लेकिन, profit 2 loss Auto-Invest activation की तुलना में कुछ कम होगा। 
+            एक AI Engineer होने के नाते मैंने Machine Learning models का उपयोग करके एक बेहतर prediction system विकसित किया है। 
+            फिर भी हमें भविष्य में होने वाली losses पर विचार करना चाहिए। अगर आपको लगता है कि system अस्थिर लग रहा है और 
+            आपको लगता है कि आपका पैसा यहाँ safe नहीं है, तो आप हमेशा अपने funds को withdraw करने के लिए स्वागत है और हमेशा system में वापस आने के लिए स्वागत है।
+            
+            <div class="language-section">
+                <div class="language-title">తెలుగు (Telugu):</div>
+                మా system కొన్ని strategy తో నడుస్తోంది, దాన్ని మీరు వెబ్‌సైట్ పైభాగంలో చూడవచ్చు. 
+                ఉదాహరణ: system 11 stages తో 2 loss Auto-Invest activation తో నడుస్తున్నట్లయితే. దీని అర్థం మా system 12 losses వరకు stable గా ఉంటుంది. 
+                13వ loss వచ్చినప్పుడు మా మొత్తం డబ్బు loss అవుతుంది. మనం మరింత safe గా ఉండాలనుకుంటే 3 loss Auto-Invest activation ఉపయోగించవచ్చు. 
+                అప్పుడు ఇది 2 loss Auto-Invest activation కంటే కొంచెం మరింత safe గా ఉంటుంది. కానీ, profit 2 loss Auto-Invest activation కంటే కొంచెం తక్కువగా ఉంటుంది. 
+                నేను ఒక AI Engineer గా Machine Learning models ఉపయోగించి మెరుగైన prediction system అభివృద్ధి చేశాను. 
+                అయినా, భవిష్యత్తులో జరగవచ్చే losses గురించి మనం పరిగణలోకి తీసుకోవాలి. మీరు system అస్థిరంగా అనిపిస్తే, 
+                మీ డబ్బు ఇక్కడ safe గా లేదని మీకు అనిపిస్తే, మీరు ఎప్పుడైనా మీ funds ను withdraw చేసుకోవడానికి స్వాగతం మరియు మళ్ళీ system లోకి తిరిగి రావడానికి ఎల్లప్పుడూ స్వాగతం.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
