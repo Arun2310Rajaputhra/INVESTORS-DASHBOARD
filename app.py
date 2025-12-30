@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import os
 import time
+import requests
+from io import StringIO
 
 # Page configuration
 st.set_page_config(
@@ -15,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with animations
+# Custom CSS with animations and new styles
 st.markdown("""
 <style>
     /* Background image */
@@ -45,6 +47,143 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* MARQUEE SCROLLING TEXT STYLES */
+    .marquee-container {
+        width: 100%;
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 8px 0;
+        margin-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 255, 0, 0.3);
+    }
+    
+    .marquee-text {
+        color: #FFFF00 !important; /* Yellow color */
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        display: inline-block;
+        padding-left: 100%;
+        animation: marquee 20s linear infinite;
+        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+    }
+    
+    @keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+    
+    /* TERMS & CONDITIONS MODAL STYLES */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .modal-content {
+        background: linear-gradient(135deg, rgba(0, 31, 63, 0.95), rgba(0, 20, 40, 0.95));
+        border-radius: 15px;
+        padding: 2rem;
+        width: 80%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.5s ease-out;
+    }
+    
+    .modal-header {
+        color: #FF6B6B;
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+    }
+    
+    .modal-body {
+        color: #FFFFFF;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 8px;
+        max-height: 50vh;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 1.5rem;
+    }
+    
+    .agree-button {
+        background: linear-gradient(135deg, #00C853, #00E676);
+        color: white;
+        border: none;
+        padding: 12px 40px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+    }
+    
+    .agree-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 200, 83, 0.5);
+        background: linear-gradient(135deg, #00E676, #00C853);
+    }
+    
+    .agree-button:active {
+        transform: translateY(0);
+    }
+    
+    /* Terms & Conditions text styling */
+    .terms-text {
+        font-family: 'Arial', sans-serif;
+    }
+    
+    .terms-text h3 {
+        color: #4FC3F7;
+        margin-top: 1.2rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .terms-text p {
+        margin-bottom: 0.8rem;
+    }
+    
+    .terms-text ul {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .terms-text li {
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Main header */
     .main-header {
         font-size: 1.6rem;
         color: #1E88E5;
@@ -169,7 +308,7 @@ st.markdown("""
         font-weight: bold;
     }
     .pending-alert {
-        background-color: #FFF3CD;
+        background-color: rgba(255, 243, 205, 0.9);
         border: 1px solid #FFEEBA;
         padding: 1rem;
         border-radius: 5px;
@@ -205,7 +344,7 @@ st.markdown("""
         to { opacity: 1; }
     }
     @keyframes slideUp {
-        from { transform: translateY(20px); opacity: 0; }
+        from { transform: translateY(30px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
     @keyframes slideIn {
@@ -284,6 +423,123 @@ def load_excel_data():
             finally:
                 time.sleep(0.5)
                 loading_placeholder.empty()
+
+@st.cache_data(ttl=300)
+def load_scrolling_text():
+    """Load scrolling text from Current_System sheet cell A1"""
+    try:
+        github_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/INVESTMENT_APP_DETAILS_UPDATE.xlsx"
+        excel_data = pd.ExcelFile(github_url)
+        
+        # Check if Current_System sheet exists
+        if 'Current_System' in excel_data.sheet_names:
+            df = excel_data.parse('Current_System')
+            if not df.empty:
+                # Get text from cell A1 (first row, first column)
+                scrolling_text = str(df.iat[0, 0]) if pd.notna(df.iat[0, 0]) else "Important Updates Will Appear Here"
+                return scrolling_text
+        return "Important Updates Will Appear Here"
+    except Exception as e:
+        st.error(f"Error loading scrolling text: {str(e)}")
+        return "Important Updates Will Appear Here"
+
+@st.cache_data(ttl=300)
+def load_terms_and_conditions():
+    """Load Terms & Conditions from text file"""
+    try:
+        # GitHub raw URL for the text file
+        txt_url = "https://raw.githubusercontent.com/Arun2310Rajaputhra/INVESTORS-DASHBOARD/main/Terms_And_Conditions.txt"
+        
+        # Download the file
+        response = requests.get(txt_url)
+        response.raise_for_status()
+        
+        # Return the content with UTF-8 decoding
+        return response.content.decode('utf-8')
+    except Exception as e:
+        st.error(f"Error loading Terms & Conditions: {str(e)}")
+        return """
+        TERMS AND CONDITIONS
+
+        1. Acceptance of Terms
+        By accessing and using this Quantum Predictions Dashboard, you agree to be bound by these Terms and Conditions.
+
+        2. Investment Risks
+        All investments carry risk. Past performance does not guarantee future results. You should only invest what you can afford to lose.
+
+        3. Data Accuracy
+        While we strive for accuracy, we cannot guarantee that all information displayed is complete, current, or error-free.
+
+        4. User Responsibility
+        You are responsible for maintaining the confidentiality of your login credentials and for all activities under your account.
+
+        5. Limitation of Liability
+        Quantum Predictions shall not be liable for any direct, indirect, incidental, or consequential damages resulting from your use of this dashboard.
+
+        6. Modifications
+        We reserve the right to modify these terms at any time. Continued use constitutes acceptance of modified terms.
+
+        7. Governing Law
+        These terms shall be governed by the laws of India, with jurisdiction in Hyderabad.
+
+        By clicking "I Agree", you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
+        """
+
+def display_terms_modal():
+    """Display Terms & Conditions modal if not agreed yet"""
+    # Check if user has already agreed
+    if 'terms_accepted' not in st.session_state:
+        st.session_state.terms_accepted = False
+    
+    # If not accepted, show modal
+    if not st.session_state.terms_accepted:
+        # Load terms content
+        terms_content = load_terms_and_conditions()
+        
+        # Create modal HTML
+        modal_html = f"""
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    📜 TERMS AND CONDITIONS
+                </div>
+                <div class="modal-body terms-text">
+                    {terms_content.replace(chr(10), '<br>').replace(chr(13), '')}
+                </div>
+                <div class="modal-footer">
+                    <button onclick="agreeToTerms()" class="agree-button">
+                        ✓ I HAVE READ AND AGREE TO THE TERMS & CONDITIONS
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        function agreeToTerms() {{
+            // Send agreement to Streamlit
+            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: 'agreed'}}, '*');
+        }}
+        
+        // Prevent closing with escape key
+        document.addEventListener('keydown', function(e) {{
+            if (e.key === 'Escape') {{
+                e.preventDefault();
+            }}
+        }});
+        </script>
+        """
+        
+        # Display the modal
+        st.markdown(modal_html, unsafe_allow_html=True)
+        
+        # Create a hidden component to capture the agreement
+        if st.button("", key="hidden_agree_button", type="secondary"):
+            st.session_state.terms_accepted = True
+            st.rerun()
+        
+        # Return False to indicate modal is showing
+        return False
+    return True
 
 def calculate_user_metrics(user_id, data):
     """Calculate all metrics for a specific user"""
@@ -576,7 +832,38 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def main():
-    # SOLUTION 1: Using rem units
+    # Display Terms & Conditions Modal FIRST
+    # If user hasn't agreed, show modal and stop further execution
+    if not display_terms_modal():
+        # Create a placeholder to capture JavaScript events
+        st.markdown("""
+        <script>
+        // Listen for the agreement message from the modal
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'streamlit:setComponentValue' && event.data.value === 'agreed') {
+                // Trigger the Streamlit button click
+                const button = window.parent.document.querySelector('button[kind="secondary"]');
+                if (button) button.click();
+            }
+        });
+        </script>
+        """, unsafe_allow_html=True)
+        return  # Stop execution until user agrees
+    
+    # Now display the scrolling text and main dashboard
+    # 1. LOAD AND DISPLAY SCROLLING TEXT
+    scrolling_text = load_scrolling_text()
+    
+    # Display marquee with scrolling text
+    st.markdown(f"""
+    <div class="marquee-container">
+        <div class="marquee-text">
+            ⚡ {scrolling_text} ⚡
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 2. MAIN DASHBOARD HEADER
     st.markdown("""
     <div style="text-align: center;">
         <h6 style="margin-bottom: 0; font-size: 1.8rem; color: yellow;">QUANTUM PREDICTIONS</h6>
