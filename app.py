@@ -55,26 +55,22 @@ st.markdown("""
         padding: 8px 0;
         margin-bottom: 10px;
         border-bottom: 2px solid rgba(255, 255, 0, 0.3);
+        position: relative;
+    }
+    
+    .marquee-content {
+        display: inline-block;
+        white-space: nowrap;
+        position: relative;
     }
     
     .marquee-text {
         color: #FFFF00 !important; /* Yellow color */
         font-size: 14px;
         font-weight: 500;
-        white-space: nowrap;
+        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
         display: inline-block;
         padding-left: 100%;
-        animation: marquee 20s linear infinite;
-        text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
-    }
-    
-    @keyframes marquee {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(-100%);
-        }
     }
     
     /* TERMS & CONDITIONS MODAL STYLES */
@@ -365,6 +361,44 @@ st.markdown("""
         to { transform: translateY(0); opacity: 1; }
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Add JavaScript for marquee scrolling
+st.markdown("""
+<script>
+// Marquee scrolling function
+function startMarquee() {
+    const marqueeContent = document.querySelector('.marquee-content');
+    const marqueeText = document.querySelector('.marquee-text');
+    
+    if (marqueeContent && marqueeText) {
+        // Get the text width
+        const textWidth = marqueeText.offsetWidth;
+        
+        // Create animation
+        let position = 0;
+        
+        function animate() {
+            position -= 1; // Speed of scroll
+            if (position < -textWidth) {
+                position = window.innerWidth; // Reset to right side
+            }
+            marqueeContent.style.transform = `translateX(${position}px)`;
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+    }
+}
+
+// Start marquee when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startMarquee);
+} else {
+    startMarquee();
+}
+</script>
 """, unsafe_allow_html=True)
 
 # Add copyright footer
@@ -857,10 +891,48 @@ def main():
     # Display marquee with scrolling text
     st.markdown(f"""
     <div class="marquee-container">
-        <div class="marquee-text">
-            ⚡ {scrolling_text} ⚡
+        <div class="marquee-content">
+            <span class="marquee-text">⚡ {scrolling_text} ⚡</span>
         </div>
     </div>
+    
+    <script>
+    // Simple marquee animation
+    setTimeout(function() {{
+        const container = document.querySelector('.marquee-container');
+        const content = document.querySelector('.marquee-content');
+        const text = document.querySelector('.marquee-text');
+        
+        if (container && content && text) {{
+            const containerWidth = container.offsetWidth;
+            const textWidth = text.offsetWidth;
+            
+            // Duplicate text for seamless scrolling
+            content.innerHTML += ' ⚡ {scrolling_text} ⚡ ';
+            
+            // Calculate animation duration based on text length
+            const duration = textWidth / 50; // pixels per second
+            
+            // Apply animation
+            content.style.animation = `marquee ${{duration}}s linear infinite`;
+            
+            // Define the keyframes
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes marquee {{
+                    0% {{ transform: translateX(100%); }}
+                    100% {{ transform: translateX(-100%); }}
+                }}
+                .marquee-content {{
+                    display: inline-block;
+                    white-space: nowrap;
+                    animation: marquee ${{duration}}s linear infinite;
+                }}
+            `;
+            document.head.appendChild(style);
+        }}
+    }}, 100);
+    </script>
     """, unsafe_allow_html=True)
     
     # 2. MAIN DASHBOARD HEADER
