@@ -1035,8 +1035,8 @@ def main():
                 Our Live Server
             </a>
             
-            <!-- Terms & Conditions Link -->
-            <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
+            <!-- Terms & Conditions Link - Google Sites -->
+            <a href="https://sites.google.com/view/quantum-pred-terms-conditions" 
                target="_blank" 
                class="page-link-item"
                rel="noopener noreferrer">
@@ -1044,13 +1044,13 @@ def main():
                 Terms & Conditions
             </a>
             
-            <!-- User Manual Link -->
-            <a href="https://docs.google.com/videos/d/1UYx8dPjjR8uY-833BFgclFGFMWMyZQtI-vU6vH1Mg6A/edit?usp=sharing" 
+            <!-- User Manual Link - Google Drive Video -->
+            <a href="https://drive.google.com/file/d/1UYx8dPjjR8uY-833BFgclFGFMWMyZQtI-vU6vH1Mg6A/view" 
                target="_blank" 
                class="page-link-item"
                rel="noopener noreferrer">
-                <i class="fas fa-book"></i>
-                User Manual
+                <i class="fas fa-video"></i>
+                User Manual (Video)
             </a>
         </div>
     </div>
