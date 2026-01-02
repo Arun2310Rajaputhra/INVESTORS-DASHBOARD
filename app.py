@@ -1034,24 +1034,6 @@ def main():
                 <i class="fab fa-telegram"></i>
                 Our Live Server
             </a>
-            
-            <!-- Terms & Conditions Link - Google Sites -->
-            <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
-               target="_blank" 
-               class="page-link-item"
-               rel="noopener noreferrer">
-                <i class="fas fa-file-contract"></i>
-                Terms & Conditions
-            </a>
-            
-            <!-- User Manual Link - Google Drive Video -->
-            <a href="https://drive.google.com/file/d/1UYx8dPjjR8uY-833BFgclFGFMWMyZQtI-vU6vH1Mg6A/view" 
-               target="_blank" 
-               class="page-link-item"
-               rel="noopener noreferrer">
-                <i class="fas fa-video"></i>
-                User Manual (Video)
-            </a>
         </div>
     </div>
     """, unsafe_allow_html=True)
