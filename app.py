@@ -374,6 +374,37 @@ def calculate_user_metrics(user_id, data):
     
     return metrics
 
+def get_user_reinvestment_data(user_id, data):
+    """Get re-investment details for specific user"""
+    re_invest_df = data.get('Re_Investment_Details', pd.DataFrame())
+    if re_invest_df.empty:
+        return pd.DataFrame()
+    
+    # Try different possible column names for UserID
+    user_id_column = None
+    possible_column_names = ['UserID', 'Userid', 'USERID', 'userid', 'User ID', 'User_Id']
+    
+    for col in possible_column_names:
+        if col in re_invest_df.columns:
+            user_id_column = col
+            break
+    
+    if user_id_column:
+        # Filter for user
+        user_reinvest = re_invest_df[re_invest_df[user_id_column] == user_id].copy()
+        
+        # Select only required columns
+        required_columns = ['Re-Invest_ID', 'Requested_Amount', 'Total_Added_Amount', 
+                          'Pending_Amount_To_Be_Add', 'Applied_To_Main_Investment_Status']
+        
+        # Filter only existing columns
+        available_columns = [col for col in required_columns if col in user_reinvest.columns]
+        
+        if not user_reinvest.empty and available_columns:
+            return user_reinvest[available_columns]
+    
+    return pd.DataFrame()
+
 def create_company_profit_graph(data):
     """Create company profit graph (excluding negatives) with transparent style from Code 2"""
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
@@ -851,6 +882,57 @@ def main():
             )
         else:
             st.info("No investment history found.")
+        
+        # NEW SECTION: Re-Investment Details
+        st.markdown('<div class="light-red-heading">🔄 Your Re-Investment Details</div>', unsafe_allow_html=True)
+        
+        # Get re-investment data
+        reinvest_data = get_user_reinvestment_data(metrics['user_id'], data)
+        
+        if not reinvest_data.empty:
+            # Calculate summary metrics
+            total_requested = reinvest_data['Requested_Amount'].sum() if 'Requested_Amount' in reinvest_data.columns else 0
+            total_added = reinvest_data['Total_Added_Amount'].sum() if 'Total_Added_Amount' in reinvest_data.columns else 0
+            total_pending = reinvest_data['Pending_Amount_To_Be_Add'].sum() if 'Pending_Amount_To_Be_Add' in reinvest_data.columns else 0
+            
+            # Display summary metrics
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Total Requested", f"₹{total_requested:,.2f}")
+            with col2:
+                st.metric("Total Added", f"₹{total_added:,.2f}")
+            with col3:
+                st.metric("Total Pending", f"₹{total_pending:,.2f}")
+            
+            # Display the re-investment table
+            # Define column renaming for better display
+            column_rename = {
+                'Re-Invest_ID': 'Re-Investment ID',
+                'Requested_Amount': 'Requested Amount (₹)',
+                'Total_Added_Amount': 'Total Added (₹)',
+                'Pending_Amount_To_Be_Add': 'Pending to Add (₹)',
+                'Applied_To_Main_Investment_Status': 'Status'
+            }
+            
+            # Only rename columns that exist in the data
+            rename_dict = {col: column_rename[col] for col in reinvest_data.columns if col in column_rename}
+            
+            st.dataframe(
+                reinvest_data.rename(columns=rename_dict),
+                use_container_width=True,
+                hide_index=True
+            )
+            
+            # Download button for re-investment data
+            csv_reinvest = reinvest_data.to_csv(index=False)
+            st.download_button(
+                label="📥 Download Re-Investment Data",
+                data=csv_reinvest,
+                file_name=f"{metrics['user_id']}_reinvestment_data.csv",
+                mime="text/csv",
+            )
+        else:
+            st.info("No re-investment records found.")
         
         # Platform Charges Status - With BRIGHT SHINING RED Color
         st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
