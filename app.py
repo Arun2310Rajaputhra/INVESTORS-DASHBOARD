@@ -199,6 +199,52 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* Page Links Footer */
+    .page-links-footer {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(1px);
+        animation: fadeIn 1s;
+    }
+    
+    .page-links-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .page-link-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #a0d2ff;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        padding: 8px 15px;
+        border-radius: 5px;
+        background-color: rgba(0, 31, 63, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .page-link-item:hover {
+        background-color: rgba(0, 31, 63, 0.5);
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        text-decoration: none;
+    }
+    
+    .page-link-item i {
+        font-size: 16px;
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -975,6 +1021,40 @@ def main():
     
     else:
         st.error("Could not load user metrics. Please try again.")
+    
+    # Add Page Links Footer at the very bottom
+    st.markdown("""
+    <div class="page-links-footer">
+        <div class="page-links-container">
+            <!-- Our Live Server Link -->
+            <a href="https://t.me/RajputhQuantumPredictions" 
+               target="_blank" 
+               class="page-link-item"
+               rel="noopener noreferrer">
+                <i class="fab fa-telegram"></i>
+                Our Live Server
+            </a>
+            
+            <!-- Terms & Conditions Link -->
+            <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
+               target="_blank" 
+               class="page-link-item"
+               rel="noopener noreferrer">
+                <i class="fas fa-file-contract"></i>
+                Terms & Conditions
+            </a>
+            
+            <!-- User Manual Link -->
+            <a href="https://docs.google.com/videos/d/1UYx8dPjjR8uY-833BFgclFGFMWMyZQtI-vU6vH1Mg6A/edit?usp=sharing" 
+               target="_blank" 
+               class="page-link-item"
+               rel="noopener noreferrer">
+                <i class="fas fa-book"></i>
+                User Manual
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
