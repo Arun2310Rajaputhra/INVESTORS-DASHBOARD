@@ -890,40 +890,35 @@ def main():
         reinvest_data = get_user_reinvestment_data(metrics['user_id'], data)
         
         if not reinvest_data.empty:
-            # Calculate summary metrics
-            total_requested = reinvest_data['Requested_Amount'].sum() if 'Requested_Amount' in reinvest_data.columns else 0
-            total_added = reinvest_data['Total_Added_Amount'].sum() if 'Total_Added_Amount' in reinvest_data.columns else 0
-            total_pending = reinvest_data['Pending_Amount_To_Be_Add'].sum() if 'Pending_Amount_To_Be_Add' in reinvest_data.columns else 0
-            
-            # Display summary metrics
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total Requested", f"₹{total_requested:,.2f}")
-            with col2:
-                st.metric("Total Added", f"₹{total_added:,.2f}")
-            with col3:
-                st.metric("Total Pending", f"₹{total_pending:,.2f}")
-            
             # Display the re-investment table
             # Define column renaming for better display
             column_rename = {
-                'Re-Invest_ID': 'Re-Investment ID',
-                'Requested_Amount': 'Requested Amount (₹)',
-                'Total_Added_Amount': 'Total Added (₹)',
-                'Pending_Amount_To_Be_Add': 'Pending to Add (₹)',
-                'Applied_To_Main_Investment_Status': 'Status'
+                'Re-Invest_ID': 'Request ID',
+                'Requested_Amount': 'Requested Amount',
+                'Total_Added_Amount': 'Till Now Added Amount',
+                'Pending_Amount_To_Be_Add': 'Still Pending Amount To Add',
+                'Applied_To_Main_Investment_Status': 'Updated To Main Investment'
             }
             
             # Only rename columns that exist in the data
             rename_dict = {col: column_rename[col] for col in reinvest_data.columns if col in column_rename}
             
+            # Format the display dataframe
+            display_df = reinvest_data.rename(columns=rename_dict)
+            
+            # Format currency columns with ₹ symbol
+            currency_columns = ['Requested Amount', 'Till Now Added Amount', 'Still Pending Amount To Add']
+            for col in currency_columns:
+                if col in display_df.columns:
+                    display_df[col] = display_df[col].apply(lambda x: f'₹{x:,.2f}' if pd.notna(x) else '₹0.00')
+            
             st.dataframe(
-                reinvest_data.rename(columns=rename_dict),
+                display_df,
                 use_container_width=True,
                 hide_index=True
             )
             
-            # Download button for re-investment data
+            # Download button for re-investment data (keep original format for download)
             csv_reinvest = reinvest_data.to_csv(index=False)
             st.download_button(
                 label="📥 Download Re-Investment Data",
