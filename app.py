@@ -1011,10 +1011,17 @@ def main():
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
         
-        # Calculate total company profit (from Total_Profit column)
+        # Calculate total company profit CORRECTLY (UNIQUE DAILY TOTALS)
         total_company_profit = 0
+        total_rows = 0
+        unique_dates = 0
+        
         if not daily_report_df.empty:
-            # Try to find Total_Profit column (with different possible names)
+            # Ensure Date column is datetime
+            daily_report_df['Date'] = pd.to_datetime(daily_report_df['Date'])
+            total_rows = len(daily_report_df)
+            
+            # Try to find Total_Profit column
             profit_column = None
             possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
             
@@ -1024,11 +1031,15 @@ def main():
                     break
             
             if profit_column:
-                # Sum all values in the Total_Profit column
-                total_company_profit = daily_report_df[profit_column].sum()
+                # Get unique daily Total_Profit values (take first entry per date)
+                unique_daily = daily_report_df.drop_duplicates(subset=['Date'], keep='first')
+                unique_dates = len(unique_daily)
+                total_company_profit = unique_daily[profit_column].sum()
             elif 'Profit' in daily_report_df.columns:
-                # Fallback to Profit column if Total_Profit not found
-                total_company_profit = daily_report_df['Profit'].sum()
+                # Fallback: Group by Date and sum Profit column
+                daily_totals = daily_report_df.groupby('Date')['Profit'].sum().reset_index()
+                unique_dates = len(daily_totals)
+                total_company_profit = daily_totals['Profit'].sum()
             else:
                 total_company_profit = 0
         else:
@@ -1049,6 +1060,12 @@ def main():
         
         with col3:
             st.metric("Total Company Profit", f"₹{total_company_profit:,.2f}")
+            
+            # Show info about calculation
+            if total_rows > 0 and unique_dates > 0:
+                st.caption(f"Calculated from {unique_dates} unique days")
+                if total_rows > unique_dates:
+                    st.caption(f"({total_rows} total rows in data)")
     
     else:
         st.error("Could not load user metrics. Please try again.")
