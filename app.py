@@ -643,7 +643,7 @@ def main():
                     # Payment status filter
                     payment_status = st.selectbox(
                         "Payment Status:",
-                        ["All", "Completed", "Pending", "Recovered"]
+                        ["All", "Completed", "Pending", "Recovered", "Adjusted To Self Invest"]
                     )
                 else:
                     st.error("User not found in records.")
