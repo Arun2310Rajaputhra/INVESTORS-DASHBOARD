@@ -1036,7 +1036,7 @@ def main():
             </a>
             
             <!-- Terms & Conditions Link - Google Sites -->
-            <a href="https://sites.google.com/view/quantum-pred-terms-conditions" 
+            <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
                target="_blank" 
                class="page-link-item"
                rel="noopener noreferrer">
