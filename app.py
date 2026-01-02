@@ -628,9 +628,21 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     # Filter for user
     user_data = daily_report_df[daily_report_df['UserID'] == user_id].copy()
     
-    # Make sure Total_Profit column exists (rename if needed)
-    if 'Total_Profit' not in user_data.columns and 'Total Profit' in user_data.columns:
-        user_data['Total_Profit'] = user_data['Total Profit']
+    # Try to find Total_Profit column with different variations
+    profit_column = None
+    possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
+    
+    for col in possible_column_names:
+        if col in user_data.columns:
+            profit_column = col
+            break
+    
+    # Make sure Total_Profit column exists (rename if found)
+    if profit_column and profit_column != 'Total_Profit':
+        user_data['Total_Profit'] = user_data[profit_column]
+    elif 'Profit' in user_data.columns and 'Total_Profit' not in user_data.columns:
+        # If only Profit column exists, use it as Total_Profit
+        user_data['Total_Profit'] = user_data['Profit']
     
     # Apply date filter if selected
     if selected_date:
@@ -886,6 +898,7 @@ def main():
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
             # Update display columns to include Total_Profit
             display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
+            # Filter to only include columns that exist in the dataframe
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
             st.dataframe(
@@ -998,10 +1011,28 @@ def main():
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
         
-        # Calculate total company profit (sum of all profits)
+        # Calculate total company profit (from Total_Profit column)
         total_company_profit = 0
         if not daily_report_df.empty:
-            total_company_profit = daily_report_df['Profit'].sum()
+            # Try to find Total_Profit column (with different possible names)
+            profit_column = None
+            possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
+            
+            for col in possible_column_names:
+                if col in daily_report_df.columns:
+                    profit_column = col
+                    break
+            
+            if profit_column:
+                # Sum all values in the Total_Profit column
+                total_company_profit = daily_report_df[profit_column].sum()
+            elif 'Profit' in daily_report_df.columns:
+                # Fallback to Profit column if Total_Profit not found
+                total_company_profit = daily_report_df['Profit'].sum()
+            else:
+                total_company_profit = 0
+        else:
+            total_company_profit = 0
         
         # Company total investment
         company_total = investor_df['Total_Invested_Amount'].sum() if not investor_df.empty else 0
