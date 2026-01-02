@@ -184,6 +184,12 @@ st.markdown("""
         z-index: 1000;
     }
     
+    /* Green text for completed payment rows */
+    .completed-row {
+        color: #00C853 !important; /* Green color for completed payments */
+        font-weight: 500;
+    }
+    
     /* Footer for copyright (from Code 2) */
     .copyright-footer {
         position: fixed;
@@ -606,6 +612,36 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     
     return user_data
 
+def style_profit_table(df):
+    """Apply styling to profit table based on payment status"""
+    # Create a styled DataFrame
+    styled_df = df.copy()
+    
+    # Apply green color to rows where Payment is "Completed"
+    def apply_row_style(row):
+        if row['Payment'] == 'Completed':
+            return ['background-color: rgba(0, 200, 83, 0.1); color: #00C853; font-weight: 500;' for _ in row]
+        else:
+            return ['background-color: transparent; color: inherit;' for _ in row]
+    
+    # Create a styled DataFrame
+    display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
+    display_cols = [col for col in display_cols if col in styled_df.columns]
+    
+    styled_df = styled_df[display_cols].rename(columns={
+        'Date': 'Date',
+        'Invest_Amount': 'Your Investment',
+        'Company_Total_Invest': 'Company Total Investment',
+        'Profit': 'Your Profit',
+        'Total_Profit': 'Company Profit',
+        'Payment': 'Payment Status'
+    })
+    
+    # Apply styling
+    styled_df = styled_df.style.apply(apply_row_style, axis=1)
+    
+    return styled_df
+
 def main():
     # SOLUTION 1: Using rem units
     st.markdown("""
@@ -838,19 +874,11 @@ def main():
             
             # Display the table with fade-in animation
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
-            # Update display columns to include Total_Profit
-            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
-            display_cols = [col for col in display_cols if col in filtered_data.columns]
             
+            # Apply styling to the table
+            styled_table = style_profit_table(filtered_data)
             st.dataframe(
-                filtered_data[display_cols].rename(columns={
-                    'Date': 'Date',
-                    'Invest_Amount': 'Your Investment',
-                    'Company_Total_Invest': 'Company Total Investment',
-                    'Profit': 'Your Profit',
-                    'Total_Profit': 'Company Profit',
-                    'Payment': 'Payment Status'
-                }),
+                styled_table,
                 use_container_width=True,
                 hide_index=True
             )
