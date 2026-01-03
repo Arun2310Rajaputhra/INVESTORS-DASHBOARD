@@ -987,7 +987,7 @@ def main():
             st.info("No data available for company investment vs profit chart.")
         
         # Filtered Data Table
-        st.markdown('<div class="light-red-heading">📋 Your Profit Details</div>', unsafe_allow_html=True)
+        st.markdown('<div class="light-red-heading">📋 Your Profit Details (Filtered Data)</div>', unsafe_allow_html=True)
         
         # Get filtered data
         filtered_data = create_user_profit_table(
@@ -1030,7 +1030,7 @@ def main():
                     'Date': 'Date',
                     'Invest_Amount': 'Your Investment (₹)',
                     'Company_Total_Invest': 'Company Total Investment (₹)',
-                    'Profit': 'Your Profit (₹)',
+                    'Profit': 'Your Profit With Tax(₹)',
                     'Total_Profit': 'Company Profit (₹)',
                     'Payment': 'Payment Status'
                 }),
