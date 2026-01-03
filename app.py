@@ -925,7 +925,7 @@ def main():
         with col4:
             st.markdown(f"""
             <div class='metric-card'>
-                <h4>Expected Month End</h4>
+                <h4>Expected Profit For Next 30 Days</h4>
                 <h2>₹{metrics['expected_monthly']:,.2f}</h2>
                 <small>Based on daily avg: ₹{metrics['avg_daily_profit']:.2f}</small>
             </div>
