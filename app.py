@@ -618,6 +618,139 @@ def create_investment_vs_profit_chart(data, selected_user=None):
     
     return fig
 
+def create_company_investment_vs_profit_chart(data):
+    """Create candle-type vertical bar chart for COMPANY investment vs profit"""
+    investor_df = data.get('Investor_Details', pd.DataFrame())
+    
+    if investor_df.empty:
+        return None
+    
+    # Get company totals
+    company_total_investment = investor_df['Total_Invested_Amount'].sum() if 'Total_Invested_Amount' in investor_df.columns else 0
+    
+    # Get total company profit from Daily_Report
+    daily_report_df = data.get('Daily_Report', pd.DataFrame())
+    total_company_profit = 0
+    if not daily_report_df.empty:
+        # Get unique daily Total_Profit values
+        daily_report_df['Date'] = pd.to_datetime(daily_report_df['Date'])
+        unique_daily = daily_report_df.drop_duplicates(subset=['Date'], keep='first')
+        
+        # Try to find Total_Profit column
+        profit_column = None
+        possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
+        
+        for col in possible_column_names:
+            if col in unique_daily.columns:
+                profit_column = col
+                break
+        
+        if profit_column:
+            total_company_profit = unique_daily[profit_column].sum()
+        elif 'Profit' in unique_daily.columns:
+            total_company_profit = unique_daily['Profit'].sum()
+    
+    # Create data for the chart
+    categories = ['Company']
+    investments = [company_total_investment]
+    profits = [total_company_profit]
+    
+    # Create figure
+    fig = go.Figure()
+    
+    # Add Investment bars (base)
+    fig.add_trace(go.Bar(
+        x=categories,
+        y=investments,
+        name='Total Company Investment',
+        marker_color='#1E88E5',  # Blue
+        opacity=0.8,
+        width=0.4,
+        offset=-0.2,  # Position to left
+        text=[f'₹{x:,.0f}' for x in investments],
+        textposition='auto',
+        hovertext=[
+            f"<b>Company</b><br>" +
+            f"Total Investment: ₹{inv:,.2f}<br>" +
+            f"Total Profit: ₹{profit:,.2f}<br>" +
+            f"ROI: {roi:.1f}%"
+            for inv, profit, roi in zip(
+                investments,
+                profits,
+                [(profit/inv*100) if inv > 0 else 0 for inv, profit in zip(investments, profits)]
+            )
+        ],
+        hoverinfo='text'
+    ))
+    
+    # Add Profit bars (on top)
+    profit_colors = ['#00C853' if profit >= 0 else '#FF5252' for profit in profits]
+    
+    fig.add_trace(go.Bar(
+        x=categories,
+        y=profits,
+        name='Total Company Profit',
+        marker_color=profit_colors,
+        opacity=0.8,
+        width=0.4,
+        offset=0.2,  # Position to right
+        text=[f'₹{x:,.0f}' for x in profits],
+        textposition='auto',
+        hovertext=[
+            f"<b>Company</b><br>" +
+            f"Total Investment: ₹{inv:,.2f}<br>" +
+            f"Total Profit: ₹{profit:,.2f}<br>" +
+            f"Status: {'Profit' if profit >= 0 else 'Loss'}<br>" +
+            f"ROI: {roi:.1f}%"
+            for inv, profit, roi in zip(
+                investments,
+                profits,
+                [(profit/inv*100) if inv > 0 else 0 for inv, profit in zip(investments, profits)]
+            )
+        ],
+        hoverinfo='text'
+    ))
+    
+    # Add connecting lines between bars
+    for i, (inv, profit) in enumerate(zip(investments, profits)):
+        # Add line from investment bar to profit bar
+        fig.add_shape(
+            type="line",
+            x0=i-0.1, x1=i+0.1,
+            y0=inv, y1=inv,
+            line=dict(color="rgba(255,255,255,0.3)", width=1),
+        )
+    
+    # Update layout
+    fig.update_layout(
+        title='🏢 Company Total Investment vs Total Profit',
+        xaxis_title='',
+        yaxis_title='Amount (₹)',
+        barmode='group',
+        bargap=0.15,
+        bargroupgap=0.1,
+        hovermode='x unified',
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='white',
+        height=400,
+        margin=dict(l=50, r=50, t=80, b=50)
+    )
+    
+    # Format y-axis with ₹ symbol
+    fig.update_yaxes(tickprefix='₹ ')
+    
+    return fig
+
 def create_user_profit_table(user_id, data, selected_date=None, payment_status=None):
     """Create filtered profit table for user"""
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
@@ -824,44 +957,34 @@ def main():
             st.plotly_chart(profit_chart, use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Add insights based on the chart
-            if view_option == "Your Data Only":
-                # Calculate user's specific metrics
-                user_metrics = calculate_user_metrics(selected_user, data)
-                if user_metrics:
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        profit_status = "✅ Profit" if user_metrics['total_profit'] >= 0 else "❌ Loss"
-                        st.metric("Current Status", profit_status)
-                    
-                    with col2:
-                        roi_color = "green" if user_metrics['roi'] >= 0 else "red"
-                        st.markdown(f"""
-                        <div style='text-align: center; padding: 10px; border-radius: 5px; border: 1px solid {roi_color};'>
-                            <h4 style='margin: 0; color: {roi_color};'>ROI</h4>
-                            <h2 style='margin: 0; color: {roi_color};'>{user_metrics['roi']:.2f}%</h2>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    with col3:
-                        efficiency = (user_metrics['total_profit'] / user_metrics['total_investment']) if user_metrics['total_investment'] > 0 else 0
-                        efficiency_text = "High" if efficiency > 0.1 else "Medium" if efficiency > 0 else "Low"
-                        st.metric("Investment Efficiency", efficiency_text)
-            else:
+            # REMOVED: ROI insights section below the chart (as requested)
+            # Just show tip for comparison view
+            if view_option == "Compare with Other Investors":
                 st.info("💡 **Tip:** Compare your investment performance with other investors. Hover over bars to see detailed metrics.")
         else:
             st.info("No data available for the investment vs profit chart.")
         
-        # Company Profit Graph - Using transparent style from Code 2
-        st.markdown('<div class="light-red-heading">📊 Company Profit Trend</div>', unsafe_allow_html=True)
+        # Company Profit Trend and Company Investment vs Profit
+        st.markdown('<div class="light-red-heading">📊 Company Performance</div>', unsafe_allow_html=True)
+        
+        # Company Profit Graph
         profit_fig = create_company_profit_graph(data)
         if profit_fig:
-            # Wrap plotly chart in a transparent container from Code 2
+            # Wrap plotly chart in a transparent container
             st.markdown("<div class='plotly-container'>", unsafe_allow_html=True)
             st.plotly_chart(profit_fig, use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.info("No profit data available for graph.")
+        
+        # NEW: Company Investment vs Profit Candle Chart
+        company_chart = create_company_investment_vs_profit_chart(data)
+        if company_chart:
+            st.markdown("<div class='plotly-container'>", unsafe_allow_html=True)
+            st.plotly_chart(company_chart, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.info("No data available for company investment vs profit chart.")
         
         # Filtered Data Table
         st.markdown('<div class="light-red-heading">📋 Your Profit Details</div>', unsafe_allow_html=True)
@@ -901,13 +1024,14 @@ def main():
             # Filter to only include columns that exist in the dataframe
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
+            # UPDATED: Added ₹ symbols to column headers
             st.dataframe(
                 filtered_data[display_cols].rename(columns={
                     'Date': 'Date',
-                    'Invest_Amount': 'Your Investment',
-                    'Company_Total_Invest': 'Company Total Investment',
-                    'Profit': 'Your Profit',
-                    'Total_Profit': 'Company Profit',
+                    'Invest_Amount': 'Your Investment (₹)',
+                    'Company_Total_Invest': 'Company Total Investment (₹)',
+                    'Profit': 'Your Profit (₹)',
+                    'Total_Profit': 'Company Profit (₹)',
                     'Payment': 'Payment Status'
                 }),
                 use_container_width=True,
@@ -926,8 +1050,8 @@ def main():
         else:
             st.info("No data found for the selected filters.")
         
-        # Investment History
-        st.markdown('<div class="light-red-heading">💰 Your Investment History</div>', unsafe_allow_html=True)
+        # UPDATED: Changed section title from "Your Investment History" to "Your Main Investment History"
+        st.markdown('<div class="light-red-heading">💰 Your Main Investment History</div>', unsafe_allow_html=True)
         if metrics['investment_history']:
             invest_df = pd.DataFrame(metrics['investment_history'])
             st.dataframe(
@@ -1013,13 +1137,9 @@ def main():
         
         # Calculate total company profit CORRECTLY (UNIQUE DAILY TOTALS)
         total_company_profit = 0
-        total_rows = 0
-        unique_dates = 0
-        
         if not daily_report_df.empty:
             # Ensure Date column is datetime
             daily_report_df['Date'] = pd.to_datetime(daily_report_df['Date'])
-            total_rows = len(daily_report_df)
             
             # Try to find Total_Profit column
             profit_column = None
@@ -1033,12 +1153,10 @@ def main():
             if profit_column:
                 # Get unique daily Total_Profit values (take first entry per date)
                 unique_daily = daily_report_df.drop_duplicates(subset=['Date'], keep='first')
-                unique_dates = len(unique_daily)
                 total_company_profit = unique_daily[profit_column].sum()
             elif 'Profit' in daily_report_df.columns:
                 # Fallback: Group by Date and sum Profit column
                 daily_totals = daily_report_df.groupby('Date')['Profit'].sum().reset_index()
-                unique_dates = len(daily_totals)
                 total_company_profit = daily_totals['Profit'].sum()
             else:
                 total_company_profit = 0
@@ -1060,12 +1178,7 @@ def main():
         
         with col3:
             st.metric("Total Company Profit", f"₹{total_company_profit:,.2f}")
-            
-            # Show info about calculation
-            if total_rows > 0 and unique_dates > 0:
-                st.caption(f"Calculated from {unique_dates} unique days")
-                if total_rows > unique_dates:
-                    st.caption(f"({total_rows} total rows in data)")
+            # REMOVED: The calculation text as requested
     
     else:
         st.error("Could not load user metrics. Please try again.")
