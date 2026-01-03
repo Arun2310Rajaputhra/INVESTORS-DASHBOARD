@@ -199,6 +199,52 @@ st.markdown("""
         backdrop-filter: blur(1px);
     }
     
+    /* Page Links Footer */
+    .page-links-footer {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(1px);
+        animation: fadeIn 1s;
+    }
+    
+    .page-links-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .page-link-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #a0d2ff;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        padding: 8px 15px;
+        border-radius: 5px;
+        background-color: rgba(0, 31, 63, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .page-link-item:hover {
+        background-color: rgba(0, 31, 63, 0.5);
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        text-decoration: none;
+    }
+    
+    .page-link-item i {
+        font-size: 16px;
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -582,9 +628,21 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     # Filter for user
     user_data = daily_report_df[daily_report_df['UserID'] == user_id].copy()
     
-    # Make sure Total_Profit column exists (rename if needed)
-    if 'Total_Profit' not in user_data.columns and 'Total Profit' in user_data.columns:
-        user_data['Total_Profit'] = user_data['Total Profit']
+    # Try to find Total_Profit column with different variations
+    profit_column = None
+    possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
+    
+    for col in possible_column_names:
+        if col in user_data.columns:
+            profit_column = col
+            break
+    
+    # Make sure Total_Profit column exists (rename if found)
+    if profit_column and profit_column != 'Total_Profit':
+        user_data['Total_Profit'] = user_data[profit_column]
+    elif 'Profit' in user_data.columns and 'Total_Profit' not in user_data.columns:
+        # If only Profit column exists, use it as Total_Profit
+        user_data['Total_Profit'] = user_data['Profit']
     
     # Apply date filter if selected
     if selected_date:
@@ -840,6 +898,7 @@ def main():
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
             # Update display columns to include Total_Profit
             display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
+            # Filter to only include columns that exist in the dataframe
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
             st.dataframe(
@@ -952,10 +1011,39 @@ def main():
         # Get the Daily_Report data
         daily_report_df = data.get('Daily_Report', pd.DataFrame())
         
-        # Calculate total company profit (sum of all profits)
+        # Calculate total company profit CORRECTLY (UNIQUE DAILY TOTALS)
         total_company_profit = 0
+        total_rows = 0
+        unique_dates = 0
+        
         if not daily_report_df.empty:
-            total_company_profit = daily_report_df['Profit'].sum()
+            # Ensure Date column is datetime
+            daily_report_df['Date'] = pd.to_datetime(daily_report_df['Date'])
+            total_rows = len(daily_report_df)
+            
+            # Try to find Total_Profit column
+            profit_column = None
+            possible_column_names = ['Total_Profit', 'Total Profit', 'TotalProfit', 'total_profit']
+            
+            for col in possible_column_names:
+                if col in daily_report_df.columns:
+                    profit_column = col
+                    break
+            
+            if profit_column:
+                # Get unique daily Total_Profit values (take first entry per date)
+                unique_daily = daily_report_df.drop_duplicates(subset=['Date'], keep='first')
+                unique_dates = len(unique_daily)
+                total_company_profit = unique_daily[profit_column].sum()
+            elif 'Profit' in daily_report_df.columns:
+                # Fallback: Group by Date and sum Profit column
+                daily_totals = daily_report_df.groupby('Date')['Profit'].sum().reset_index()
+                unique_dates = len(daily_totals)
+                total_company_profit = daily_totals['Profit'].sum()
+            else:
+                total_company_profit = 0
+        else:
+            total_company_profit = 0
         
         # Company total investment
         company_total = investor_df['Total_Invested_Amount'].sum() if not investor_df.empty else 0
@@ -972,9 +1060,31 @@ def main():
         
         with col3:
             st.metric("Total Company Profit", f"₹{total_company_profit:,.2f}")
+            
+            # Show info about calculation
+            if total_rows > 0 and unique_dates > 0:
+                st.caption(f"Calculated from {unique_dates} unique days")
+                if total_rows > unique_dates:
+                    st.caption(f"({total_rows} total rows in data)")
     
     else:
         st.error("Could not load user metrics. Please try again.")
+    
+    # Add Page Links Footer at the very bottom
+    st.markdown("""
+    <div class="page-links-footer">
+        <div class="page-links-container">
+            <!-- Our Live Server Link -->
+            <a href="https://t.me/RajputhQuantumPredictions" 
+               target="_blank" 
+               class="page-link-item"
+               rel="noopener noreferrer">
+                <i class="fab fa-telegram"></i>
+                Our Live Server
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
