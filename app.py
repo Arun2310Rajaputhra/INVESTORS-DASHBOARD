@@ -272,7 +272,18 @@ st.markdown("""
         to { transform: translateY(0); opacity: 1; }
     }
     
-    /* Popup Modal Styles */
+    /* Popup Modal Styles - FIXED VERSION */
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        animation: fadeIn 0.3s;
+    }
+    
     .popup-modal {
         position: fixed;
         top: 50%;
@@ -290,17 +301,6 @@ st.markdown("""
         max-width: 500px;
         animation: popupSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         backdrop-filter: blur(10px);
-    }
-    
-    .popup-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 9999;
-        animation: fadeIn 0.3s;
     }
     
     .popup-title {
@@ -340,6 +340,29 @@ st.markdown("""
         background: linear-gradient(135deg, #FF8E53, #FF6B6B);
     }
     
+    .popup-close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: #FF6B6B;
+        font-size: 24px;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .popup-close-btn:hover {
+        background: rgba(255, 107, 107, 0.2);
+        transform: rotate(90deg);
+    }
+    
     @keyframes popupSlide {
         from {
             opacity: 0;
@@ -358,6 +381,11 @@ st.markdown("""
         padding: 2px 8px;
         border-radius: 4px;
         border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    /* Hide elements with this class */
+    .hide-popup {
+        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -892,10 +920,16 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def show_pending_charges_popup(total_pending):
-    """Show popup modal for pending charges"""
+    """Show popup modal for pending charges - FIXED VERSION with working close button"""
+    
+    # Generate unique IDs for this popup
+    popup_id = f"popup_{int(time.time())}"
+    overlay_id = f"overlay_{int(time.time())}"
+    
     st.markdown(f"""
-    <div class="popup-overlay" id="popupOverlay"></div>
-    <div class="popup-modal" id="popupModal">
+    <div class="popup-overlay" id="{overlay_id}" onclick="document.getElementById('{popup_id}').style.display='none'; this.style.display='none';"></div>
+    <div class="popup-modal" id="{popup_id}">
+        <button class="popup-close-btn" onclick="document.getElementById('{popup_id}').style.display='none'; document.getElementById('{overlay_id}').style.display='none';">×</button>
         <div class="popup-title">
             <i class="fas fa-exclamation-triangle"></i>
             ⚠️ PLATFORM CHARGES PENDING!
@@ -906,28 +940,10 @@ def show_pending_charges_popup(total_pending):
             <p>If you don't wish to pay? <span class="popup-highlight">No problem.</span></p>
             <p>Just ignore this message. Charges can be adjusted into your daily profit.</p>
         </div>
-        <button class="popup-button" onclick="document.getElementById('popupModal').style.display='none'; document.getElementById('popupOverlay').style.display='none';">
+        <button class="popup-button" onclick="document.getElementById('{popup_id}').style.display='none'; document.getElementById('{overlay_id}').style.display='none';">
             <i class="fas fa-check-circle"></i> I Understand
         </button>
     </div>
-    
-    <script>
-        // Auto-close after 30 seconds (optional)
-        setTimeout(function() {{
-            var modal = document.getElementById('popupModal');
-            var overlay = document.getElementById('popupOverlay');
-            if (modal && overlay) {{
-                modal.style.display = 'none';
-                overlay.style.display = 'none';
-            }}
-        }}, 30000);
-        
-        // Close on overlay click
-        document.getElementById('popupOverlay').addEventListener('click', function() {{
-            document.getElementById('popupModal').style.display = 'none';
-            this.style.display = 'none';
-        }});
-    </script>
     """, unsafe_allow_html=True)
 
 def main():
