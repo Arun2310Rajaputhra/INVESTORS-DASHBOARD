@@ -271,6 +271,94 @@ st.markdown("""
         from { transform: translateY(50px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
+    
+    /* Popup Modal Styles */
+    .popup-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+        z-index: 10000;
+        color: white;
+        text-align: center;
+        border: 3px solid #FF6B6B;
+        width: 90%;
+        max-width: 500px;
+        animation: popupSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        backdrop-filter: blur(10px);
+    }
+    
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        animation: fadeIn 0.3s;
+    }
+    
+    .popup-title {
+        color: #FF6B6B;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .popup-content {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        color: #e0e0e0;
+    }
+    
+    .popup-button {
+        background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+    
+    .popup-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        background: linear-gradient(135deg, #FF8E53, #FF6B6B);
+    }
+    
+    @keyframes popupSlide {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -60%) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    
+    .popup-highlight {
+        color: #FFD700;
+        font-weight: bold;
+        background: rgba(255, 215, 0, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -803,6 +891,45 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     
     return user_data
 
+def show_pending_charges_popup(total_pending):
+    """Show popup modal for pending charges"""
+    st.markdown(f"""
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup-modal" id="popupModal">
+        <div class="popup-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            ⚠️ PLATFORM CHARGES PENDING!
+        </div>
+        <div class="popup-content">
+            <p>You have <span class="popup-highlight">₹{total_pending:,.2f}</span> in Platform Charges Pending Amount.</p>
+            <p><strong>Please pay it at your earliest convenience.</strong></p>
+            <p>If you don't wish to pay? <span class="popup-highlight">No problem.</span></p>
+            <p>Just ignore this message. Charges can be adjusted into your daily profit.</p>
+        </div>
+        <button class="popup-button" onclick="document.getElementById('popupModal').style.display='none'; document.getElementById('popupOverlay').style.display='none';">
+            <i class="fas fa-check-circle"></i> I Understand
+        </button>
+    </div>
+    
+    <script>
+        // Auto-close after 30 seconds (optional)
+        setTimeout(function() {{
+            var modal = document.getElementById('popupModal');
+            var overlay = document.getElementById('popupOverlay');
+            if (modal && overlay) {{
+                modal.style.display = 'none';
+                overlay.style.display = 'none';
+            }}
+        }}, 30000);
+        
+        // Close on overlay click
+        document.getElementById('popupOverlay').addEventListener('click', function() {{
+            document.getElementById('popupModal').style.display = 'none';
+            this.style.display = 'none';
+        }});
+    </script>
+    """, unsafe_allow_html=True)
+
 def main():
     # SOLUTION 1: Using rem units
     st.markdown("""
@@ -1124,6 +1251,15 @@ def main():
         # Get platform charges data
         charges_data = get_user_platform_charges_data(metrics['user_id'], data)
         
+        # Calculate total pending amount
+        total_pending = 0
+        if not charges_data.empty and 'Pending_Amt' in charges_data.columns:
+            total_pending = charges_data['Pending_Amt'].sum()
+        
+        # Show popup if pending amount > 0
+        if total_pending > 0:
+            show_pending_charges_popup(total_pending)
+        
         if not charges_data.empty:
             # Display the platform charges table
             # Define column renaming as specified
@@ -1152,6 +1288,9 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
+            
+            # Show total pending amount
+            st.warning(f"**Total Pending Amount: ₹{total_pending:,.2f}**")
             
             # Download button for platform charges data
             csv_charges = charges_data.to_csv(index=False)
