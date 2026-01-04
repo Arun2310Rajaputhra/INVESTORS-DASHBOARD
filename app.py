@@ -15,6 +15,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize session state for popup
+if 'show_popup' not in st.session_state:
+    st.session_state.show_popup = False
+
 # Custom CSS with animations
 st.markdown("""
 <style>
@@ -270,122 +274,6 @@ st.markdown("""
     @keyframes floatUp {
         from { transform: translateY(50px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
-    }
-    
-    /* Popup Modal Styles - FIXED VERSION */
-    .popup-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 9999;
-        animation: fadeIn 0.3s;
-    }
-    
-    .popup-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
-        z-index: 10000;
-        color: white;
-        text-align: center;
-        border: 3px solid #FF6B6B;
-        width: 90%;
-        max-width: 500px;
-        animation: popupSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        backdrop-filter: blur(10px);
-    }
-    
-    .popup-title {
-        color: #FF6B6B;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .popup-content {
-        font-size: 16px;
-        line-height: 1.6;
-        margin-bottom: 25px;
-        color: #e0e0e0;
-    }
-    
-    .popup-button {
-        background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-    }
-    
-    .popup-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
-        background: linear-gradient(135deg, #FF8E53, #FF6B6B);
-    }
-    
-    .popup-close-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: none;
-        border: none;
-        color: #FF6B6B;
-        font-size: 24px;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-    }
-    
-    .popup-close-btn:hover {
-        background: rgba(255, 107, 107, 0.2);
-        transform: rotate(90deg);
-    }
-    
-    @keyframes popupSlide {
-        from {
-            opacity: 0;
-            transform: translate(-50%, -60%) scale(0.9);
-        }
-        to {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-    }
-    
-    .popup-highlight {
-        color: #FFD700;
-        font-weight: bold;
-        background: rgba(255, 215, 0, 0.1);
-        padding: 2px 8px;
-        border-radius: 4px;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-    }
-    
-    /* Hide elements with this class */
-    .hide-popup {
-        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -920,31 +808,78 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
     return user_data
 
 def show_pending_charges_popup(total_pending):
-    """Show popup modal for pending charges - FIXED VERSION with working close button"""
+    """Show popup modal for pending charges - USING STREAMLIT COMPONENTS"""
     
-    # Generate unique IDs for this popup
-    popup_id = f"popup_{int(time.time())}"
-    overlay_id = f"overlay_{int(time.time())}"
+    # Create a container for the popup
+    popup_container = st.container()
     
-    st.markdown(f"""
-    <div class="popup-overlay" id="{overlay_id}" onclick="document.getElementById('{popup_id}').style.display='none'; this.style.display='none';"></div>
-    <div class="popup-modal" id="{popup_id}">
-        <button class="popup-close-btn" onclick="document.getElementById('{popup_id}').style.display='none'; document.getElementById('{overlay_id}').style.display='none';">×</button>
-        <div class="popup-title">
-            <i class="fas fa-exclamation-triangle"></i>
-            ⚠️ PLATFORM CHARGES PENDING!
-        </div>
-        <div class="popup-content">
-            <p>You have <span class="popup-highlight">₹{total_pending:,.2f}</span> in Platform Charges Pending Amount.</p>
-            <p><strong>Please pay it at your earliest convenience.</strong></p>
-            <p>If you don't wish to pay? <span class="popup-highlight">No problem.</span></p>
-            <p>Just ignore this message. Charges can be adjusted into your daily profit.</p>
-        </div>
-        <button class="popup-button" onclick="document.getElementById('{popup_id}').style.display='none'; document.getElementById('{overlay_id}').style.display='none';">
-            <i class="fas fa-check-circle"></i> I Understand
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
+    with popup_container:
+        # Create columns to center the popup
+        col1, col2, col3 = st.columns([1, 3, 1])
+        
+        with col2:
+            # Create the popup as a card
+            st.markdown("""
+            <style>
+            .popup-card {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+                color: white;
+                text-align: center;
+                border: 3px solid #FF6B6B;
+                backdrop-filter: blur(10px);
+                margin: 20px 0;
+            }
+            .popup-title {
+                color: #FF6B6B;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .popup-content {
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 25px;
+                color: #e0e0e0;
+            }
+            .popup-highlight {
+                color: #FFD700;
+                font-weight: bold;
+                background: rgba(255, 215, 0, 0.1);
+                padding: 2px 8px;
+                border-radius: 4px;
+                border: 1px solid rgba(255, 215, 0, 0.3);
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="popup-card">
+                <div class="popup-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ⚠️ PLATFORM CHARGES PENDING!
+                </div>
+                <div class="popup-content">
+                    <p>You have <span class="popup-highlight">₹{total_pending:,.2f}</span> in Platform Charges Pending Amount.</p>
+                    <p><strong>Please pay it at your earliest convenience.</strong></p>
+                    <p>If you don't wish to pay? <span class="popup-highlight">No problem.</span></p>
+                    <p>Just ignore this message. Charges can be adjusted into your daily profit.</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add a close button that uses Streamlit's callback
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+            with col_btn2:
+                if st.button("✅ I Understand", key="popup_close_btn", use_container_width=True):
+                    st.session_state.show_popup = False
+                    st.rerun()
 
 def main():
     # SOLUTION 1: Using rem units
@@ -1039,6 +974,16 @@ def main():
                     🎉 Great! You're making positive profits!
                 </div>
             </div>""", unsafe_allow_html=True)
+        
+        # Get platform charges data early to check for pending amounts
+        charges_data = get_user_platform_charges_data(metrics['user_id'], data)
+        total_pending = 0
+        if not charges_data.empty and 'Pending_Amt' in charges_data.columns:
+            total_pending = charges_data['Pending_Amt'].sum()
+        
+        # Show popup if pending amount > 0 and popup hasn't been closed
+        if total_pending > 0 and st.session_state.show_popup:
+            show_pending_charges_popup(total_pending)
         
         # Key Metrics in columns - With Light Red Heading
         st.markdown('<div class="light-red-heading">📈 Investment Overview</div>', unsafe_allow_html=True)
@@ -1264,17 +1209,10 @@ def main():
         # UPDATED: Platform Charges Status - SIMPLE VERSION like Re-Investment
         st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
         
-        # Get platform charges data
-        charges_data = get_user_platform_charges_data(metrics['user_id'], data)
-        
-        # Calculate total pending amount
-        total_pending = 0
-        if not charges_data.empty and 'Pending_Amt' in charges_data.columns:
-            total_pending = charges_data['Pending_Amt'].sum()
-        
-        # Show popup if pending amount > 0
-        if total_pending > 0:
-            show_pending_charges_popup(total_pending)
+        # Check if popup should be shown for the first time
+        if total_pending > 0 and 'popup_shown' not in st.session_state:
+            st.session_state.show_popup = True
+            st.session_state.popup_shown = True
         
         if not charges_data.empty:
             # Display the platform charges table
