@@ -337,7 +337,6 @@ def calculate_user_metrics(user_id, data):
     investor_df = data.get('Investor_Details', pd.DataFrame())
     daily_profits_df = data.get('Daily_Profits_Calculations', pd.DataFrame())
     daily_report_df = data.get('Daily_Report', pd.DataFrame())
-    charges_df = data.get('Platform_Maintaince_Charges', pd.DataFrame())
     
     # Filter for current user
     user_info = investor_df[investor_df['UserID'] == user_id]
@@ -416,12 +415,18 @@ def get_user_reinvestment_data(user_id, data):
     
     return pd.DataFrame()
 
-def get_user_charges_data(user_id, data):
-    """Get platform charges details for specific user - SIMPLE VERSION"""
-    # Try different sheet names
-    charges_df = data.get('Platform_Maintaince_Charges', pd.DataFrame())
+def get_user_platform_charges_data(user_id, data):
+    """Get platform charges details for specific user - SIMPLE VERSION like Re-Investment section"""
+    # Try to get the sheet with the correct name
+    charges_df = data.get('Platofrm_Maintaince_Charges', pd.DataFrame())
+    
+    # If not found, try alternative names
+    if charges_df.empty:
+        charges_df = data.get('Platform_Maintaince_Charges', pd.DataFrame())
+    
     if charges_df.empty:
         charges_df = data.get('Platform_Maintenance_Charges', pd.DataFrame())
+    
     if charges_df.empty:
         charges_df = data.get('Charges', pd.DataFrame())
     
@@ -441,8 +446,8 @@ def get_user_charges_data(user_id, data):
         # Filter for user
         user_charges = charges_df[charges_df[user_id_column] == user_id].copy()
         
-        # Select only required columns
-        required_columns = ['Reason_For_Charge', 'Charge_Per_Head', 'Paid_Amt', 'Pending_Amt']
+        # Select only required columns as specified
+        required_columns = ['Charge_ID', 'Reason_For_Charge', 'Charge_Per_Head', 'Paid_Amt', 'Pending_Amt']
         
         # Filter only existing columns
         available_columns = [col for col in required_columns if col in user_charges.columns]
@@ -1113,31 +1118,21 @@ def main():
         else:
             st.info("No re-investment records found.")
         
-        # UPDATED: Platform Charges Status - SIMPLE VERSION like Re-Investment Details
+        # UPDATED: Platform Charges Status - SIMPLE VERSION like Re-Investment
         st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
         
-        # Get charges data for the user
-        charges_data = get_user_charges_data(metrics['user_id'], data)
+        # Get platform charges data
+        charges_data = get_user_platform_charges_data(metrics['user_id'], data)
         
         if not charges_data.empty:
-            # Calculate total paid and total pending
-            total_paid = charges_data['Paid_Amt'].sum() if 'Paid_Amt' in charges_data.columns else 0
-            total_pending = charges_data['Pending_Amt'].sum() if 'Pending_Amt' in charges_data.columns else 0
-            
-            # Show total paid summary
-            st.markdown(f"""
-            <div style='background-color: rgba(0, 100, 0, 0.2); padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #00C853;'>
-                <strong style='color: #00C853;'>💰 Total Charges Paid Till Now: ₹{total_paid:,.2f}</strong>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Display the charges table
-            # Define column renaming for better display
+            # Display the platform charges table
+            # Define column renaming as specified
             column_rename = {
-                'Reason_For_Charge': 'Reason For Charge',
-                'Charge_Per_Head': 'Charge Per Each Person',
-                'Paid_Amt': 'Paid Amount',
-                'Pending_Amt': 'Pending Amount'
+                'Charge_ID': 'Charge ID',
+                'Reason_For_Charge': 'Reason',
+                'Charge_Per_Head': 'Charge Per Person',
+                'Paid_Amt': 'Paid',
+                'Pending_Amt': 'Pending'
             }
             
             # Only rename columns that exist in the data
@@ -1147,10 +1142,10 @@ def main():
             display_df = charges_data.rename(columns=rename_dict)
             
             # Format currency columns with ₹ symbol
-            currency_columns = ['Charge Per Each Person', 'Paid Amount', 'Pending Amount']
+            currency_columns = ['Charge Per Person', 'Paid', 'Pending']
             for col in currency_columns:
                 if col in display_df.columns:
-                    display_df[col] = display_df[col].apply(lambda x: f'₹{float(x):,.2f}' if pd.notna(x) else '₹0.00')
+                    display_df[col] = display_df[col].apply(lambda x: f'₹{x:,.2f}' if pd.notna(x) else '₹0.00')
             
             st.dataframe(
                 display_df,
@@ -1158,22 +1153,16 @@ def main():
                 hide_index=True
             )
             
-            # Show status message
-            if total_pending > 0:
-                st.warning(f"**⚠️ Total Pending Charges: ₹{total_pending:,.2f}**")
-            else:
-                st.success("✅ All platform charges are cleared!")
-                
-            # Download button for charges data
+            # Download button for platform charges data
             csv_charges = charges_data.to_csv(index=False)
             st.download_button(
-                label="📥 Download Charges Data",
+                label="📥 Download Platform Charges Data",
                 data=csv_charges,
                 file_name=f"{metrics['user_id']}_platform_charges.csv",
                 mime="text/csv",
             )
         else:
-            st.info("No platform charges records found for your account.")
+            st.success("✅ No platform charges found for your account!")
         
         # Additional Insights - With Light Red Heading
         st.markdown('<div class="light-red-heading">📊 Additional Insights</div>', unsafe_allow_html=True)
