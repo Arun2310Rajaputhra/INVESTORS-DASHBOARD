@@ -19,6 +19,10 @@ st.set_page_config(
 if 'show_popup' not in st.session_state:
     st.session_state.show_popup = True  # Changed to True by default
 
+# Initialize session state for terms popup
+if 'show_terms_popup' not in st.session_state:
+    st.session_state.show_terms_popup = True  # Show by default
+
 # Custom CSS with animations
 st.markdown("""
 <style>
@@ -348,6 +352,60 @@ st.markdown("""
         padding: 2px 8px;
         border-radius: 4px;
         border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    /* Terms & Conditions Banner */
+    .terms-banner {
+        background: linear-gradient(90deg, #4A6FA5, #6B8DC3);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 5px solid #1E3A5F;
+        box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        animation: slideInRight 0.5s ease-out;
+    }
+    
+    .terms-banner-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .terms-banner-content {
+        font-size: 14px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+    
+    .terms-link {
+        color: #FFD700;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background: rgba(255, 215, 0, 0.1);
+        border-radius: 4px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .terms-link:hover {
+        background: rgba(255, 215, 0, 0.2);
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+    }
+    
+    .terms-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -963,6 +1021,42 @@ def main():
     
     # Main Dashboard
     if metrics:
+        # ==============================================
+        # TERMS & CONDITIONS BANNER (NEW ADDITION)
+        # ==============================================
+        if st.session_state.show_terms_popup:
+            st.markdown("""
+            <div class="terms-banner">
+                <div class="terms-banner-title">
+                    <i class="fas fa-file-contract"></i>
+                    📜 IMPORTANT: Terms & Conditions
+                </div>
+                <div class="terms-banner-content">
+                    Our trading system operates with specific strategies that include risk management protocols. 
+                    Please review our complete Terms & Conditions for detailed information about system stability, 
+                    risk factors, and investment policies.
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
+                       target="_blank" 
+                       class="terms-link"
+                       rel="noopener noreferrer">
+                        <i class="fas fa-external-link-alt"></i>
+                        Click here to read complete Terms & Conditions
+                    </a>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add a close button that works with Streamlit
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col2:
+                if st.button("✅ I Understand - Close Terms Message", key="close_terms_btn", use_container_width=True):
+                    st.session_state.show_terms_popup = False
+                    st.rerun()
+            
+            st.markdown("---")  # Add a separator
+        
         # Welcome header with animation
         st.markdown(f"<h6 class='main-header'>Hello, {metrics['name']}!</h6>", unsafe_allow_html=True)
         
