@@ -1134,6 +1134,7 @@ def main():
             <div class='metric-card'>
                 <h4>Your Total Profit</h4>
                 <h2 class='{profit_class}'>₹{metrics['total_profit']:,.2f}</h2>
+                <small>(Including Tax)</small>
             </div>
             """, unsafe_allow_html=True)
         
