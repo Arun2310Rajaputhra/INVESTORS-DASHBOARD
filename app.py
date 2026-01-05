@@ -919,6 +919,11 @@ def create_user_profit_table(user_id, data, selected_date=None, payment_status=N
         # If only Profit column exists, use it as Total_Profit
         user_data['Total_Profit'] = user_data['Profit']
     
+    # Check if Remarks column exists - if not, create empty column
+    # This ensures the column appears even when empty
+    if 'Remarks' not in user_data.columns:
+        user_data['Remarks'] = ''
+    
     # Apply date filter if selected
     if selected_date:
         if isinstance(selected_date, list) and len(selected_date) == 2:
@@ -1231,12 +1236,12 @@ def main():
             
             # Display the table with fade-in animation
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
-            # Update display columns to include Total_Profit
-            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
+            # Update display columns to include Total_Profit AND Remarks
+            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment', 'Remarks']
             # Filter to only include columns that exist in the dataframe
             display_cols = [col for col in display_cols if col in filtered_data.columns]
             
-            # UPDATED: Added ₹ symbols to column headers
+            # UPDATED: Added ₹ symbols to column headers AND included Remarks
             st.dataframe(
                 filtered_data[display_cols].rename(columns={
                     'Date': 'Date',
@@ -1244,7 +1249,8 @@ def main():
                     'Company_Total_Invest': 'Company Total Investment (₹)',
                     'Profit': 'Your Profit With Tax(₹)',
                     'Total_Profit': 'Company Profit (₹)',
-                    'Payment': 'Payment Status'
+                    'Payment': 'Payment Status',
+                    'Remarks': 'Remarks'  # Added this line
                 }),
                 use_container_width=True,
                 hide_index=True

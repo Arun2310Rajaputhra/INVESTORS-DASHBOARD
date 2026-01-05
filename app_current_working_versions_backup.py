@@ -15,6 +15,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize session state for popup
+if 'show_popup' not in st.session_state:
+    st.session_state.show_popup = True  # Changed to True by default
+
+# Initialize session state for terms popup
+if 'show_terms_popup' not in st.session_state:
+    st.session_state.show_terms_popup = True  # Show by default
+
 # Custom CSS with animations
 st.markdown("""
 <style>
@@ -270,6 +278,134 @@ st.markdown("""
     @keyframes floatUp {
         from { transform: translateY(50px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Pending Alert Banner */
+    .pending-banner {
+        background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 5px solid #FF0000;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        animation: slideInRight 0.5s ease-out;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .pending-banner-content {
+        flex: 1;
+    }
+    
+    .pending-banner-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .pending-banner-message {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    
+    .pending-banner-amount {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-left: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .pending-banner-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .pending-banner-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+    
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Highlight text */
+    .highlight-text {
+        color: #FFD700;
+        font-weight: bold;
+        background: rgba(255, 215, 0, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    /* Terms & Conditions Banner */
+    .terms-banner {
+        background: linear-gradient(90deg, #4A6FA5, #6B8DC3);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 5px solid #1E3A5F;
+        box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        animation: slideInRight 0.5s ease-out;
+    }
+    
+    .terms-banner-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .terms-banner-content {
+        font-size: 14px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+    
+    .terms-link {
+        color: #FFD700;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background: rgba(255, 215, 0, 0.1);
+        border-radius: 4px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .terms-link:hover {
+        background: rgba(255, 215, 0, 0.2);
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+    }
+    
+    .terms-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -885,6 +1021,42 @@ def main():
     
     # Main Dashboard
     if metrics:
+        # ==============================================
+        # TERMS & CONDITIONS BANNER (NEW ADDITION)
+        # ==============================================
+        if st.session_state.show_terms_popup:
+            st.markdown("""
+            <div class="terms-banner">
+                <div class="terms-banner-title">
+                    <i class="fas fa-file-contract"></i>
+                    📜 IMPORTANT: Terms & Conditions
+                </div>
+                <div class="terms-banner-content">
+                    Our trading system operates with specific strategies that include risk management protocols. 
+                    Please review our complete Terms & Conditions for detailed information about system stability, 
+                    risk factors, and investment policies.
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <a href="https://sites.google.com/view/quantum-pred-terms-conditions/home" 
+                       target="_blank" 
+                       class="terms-link"
+                       rel="noopener noreferrer">
+                        <i class="fas fa-external-link-alt"></i>
+                        Click here to read complete Terms & Conditions
+                    </a>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add a close button that works with Streamlit
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col2:
+                if st.button("✅ I Understand - Close Terms Message", key="close_terms_btn", use_container_width=True):
+                    st.session_state.show_terms_popup = False
+                    st.rerun()
+            
+            st.markdown("---")  # Add a separator
+        
         # Welcome header with animation
         st.markdown(f"<h6 class='main-header'>Hello, {metrics['name']}!</h6>", unsafe_allow_html=True)
         
@@ -896,6 +1068,40 @@ def main():
                     🎉 Great! You're making positive profits!
                 </div>
             </div>""", unsafe_allow_html=True)
+        
+        # Get platform charges data early to check for pending amounts
+        charges_data = get_user_platform_charges_data(metrics['user_id'], data)
+        total_pending = 0
+        if not charges_data.empty and 'Pending_Amt' in charges_data.columns:
+            total_pending = charges_data['Pending_Amt'].sum()
+        
+        # SIMPLE BANNER APPROACH - Show a prominent banner at the top
+        if total_pending > 0 and st.session_state.show_popup:
+            st.markdown(f"""
+            <div class="pending-banner">
+                <div class="pending-banner-content">
+                    <div class="pending-banner-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ⚠️ PLATFORM CHARGES PENDING!
+                    </div>
+                    <div class="pending-banner-message">
+                        You have <span class="highlight-text">₹{total_pending:,.2f}</span> in Platform Charges Pending Amount. 
+                        Please pay it at your earliest convenience. If you don't wish to pay? No problem. 
+                        Just ignore this message. Charges can be adjusted into your daily profit.
+                    </div>
+                </div>
+                <div class="pending-banner-amount">₹{total_pending:,.2f}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add a close button that works with Streamlit
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col2:
+                if st.button("✅ I Understand - Close This Message", key="close_banner_btn", use_container_width=True):
+                    st.session_state.show_popup = False
+                    st.rerun()
+            
+            st.markdown("---")  # Add a separator
         
         # Key Metrics in columns - With Light Red Heading
         st.markdown('<div class="light-red-heading">📈 Investment Overview</div>', unsafe_allow_html=True)
@@ -1121,8 +1327,10 @@ def main():
         # UPDATED: Platform Charges Status - SIMPLE VERSION like Re-Investment
         st.markdown('<div class="bright-red-heading">⚠️ Platform Charges Status</div>', unsafe_allow_html=True)
         
-        # Get platform charges data
-        charges_data = get_user_platform_charges_data(metrics['user_id'], data)
+        # Check if popup should be shown for the first time (for users with pending)
+        if total_pending > 0 and 'popup_shown' not in st.session_state:
+            st.session_state.show_popup = True
+            st.session_state.popup_shown = True
         
         if not charges_data.empty:
             # Display the platform charges table
@@ -1152,6 +1360,9 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
+            
+            # Show total pending amount
+            st.warning(f"**Total Pending Amount: ₹{total_pending:,.2f}**")
             
             # Download button for platform charges data
             csv_charges = charges_data.to_csv(index=False)
