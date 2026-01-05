@@ -407,6 +407,39 @@ st.markdown("""
         gap: 10px;
         margin-top: 15px;
     }
+    
+    /* Remarks Column Styling */
+    .remarks-cell {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .remarks-cell:hover {
+        white-space: normal;
+        overflow: visible;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 5px;
+        border-radius: 4px;
+        z-index: 100;
+        position: relative;
+    }
+    
+    .remarks-expanded {
+        white-space: normal !important;
+        overflow: visible !important;
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        padding: 8px !important;
+        border-radius: 6px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+        z-index: 1000 !important;
+        position: relative !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1236,25 +1269,90 @@ def main():
             
             # Display the table with fade-in animation
             st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
-            # Update display columns to include Total_Profit AND Remarks
-            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment', 'Remarks']
-            # Filter to only include columns that exist in the dataframe
-            display_cols = [col for col in display_cols if col in filtered_data.columns]
             
-            # UPDATED: Added ₹ symbols to column headers AND included Remarks
+            # Create a copy for display
+            display_data = filtered_data.copy()
+            
+            # Truncate long remarks for better display (show first 60 characters)
+            if 'Remarks' in display_data.columns:
+                display_data['Remarks_Display'] = display_data['Remarks'].apply(
+                    lambda x: (str(x)[:60] + '...') if pd.notna(x) and len(str(x)) > 60 else (str(x) if pd.notna(x) else '')
+                )
+            
+            # Update display columns
+            display_cols = ['Date', 'Invest_Amount', 'Company_Total_Invest', 'Profit', 'Total_Profit', 'Payment']
+            if 'Remarks' in display_data.columns:
+                display_cols.append('Remarks_Display')
+            
+            # Filter to only include columns that exist in the dataframe
+            display_cols = [col for col in display_cols if col in display_data.columns]
+            
+            # Create the display dataframe
+            df_display = display_data[display_cols].rename(columns={
+                'Date': 'Date',
+                'Invest_Amount': 'Your Investment (₹)',
+                'Company_Total_Invest': 'Company Total Investment (₹)',
+                'Profit': 'Your Profit With Tax(₹)',
+                'Total_Profit': 'Company Profit (₹)',
+                'Payment': 'Payment Status',
+                'Remarks_Display': 'Remarks'  # Show truncated remarks
+            })
+            
+            # Display with custom column configuration for remarks
             st.dataframe(
-                filtered_data[display_cols].rename(columns={
+                df_display,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Remarks": st.column_config.TextColumn(
+                        "Remarks",
+                        help="Hover over or click to see full remarks",
+                        width="large"
+                    )
+                }
+            )
+            
+            # Add a section to view full remarks for specific rows
+            st.markdown("### 📝 View Full Remarks")
+            st.info("Click on any row in the table above, then click the button below to view complete remarks for that transaction.")
+            
+            # Get selected rows from the dataframe
+            selection = st.dataframe(
+                filtered_data[['Date', 'Profit', 'Payment', 'Remarks']].rename(columns={
                     'Date': 'Date',
-                    'Invest_Amount': 'Your Investment (₹)',
-                    'Company_Total_Invest': 'Company Total Investment (₹)',
-                    'Profit': 'Your Profit With Tax(₹)',
-                    'Total_Profit': 'Company Profit (₹)',
-                    'Payment': 'Payment Status',
-                    'Remarks': 'Remarks'  # Added this line
+                    'Profit': 'Profit (₹)',
+                    'Payment': 'Status',
+                    'Remarks': 'Remarks'
                 }),
                 use_container_width=True,
-                hide_index=True
+                hide_index=True,
+                key="remarks_selector",
+                on_select="rerun",
+                selection_mode="single-row"
             )
+            
+            # Show full remarks for selected row
+            if selection['selection']['rows']:
+                selected_row_index = selection['selection']['rows'][0]
+                if selected_row_index < len(filtered_data):
+                    selected_row = filtered_data.iloc[selected_row_index]
+                    if pd.notna(selected_row['Remarks']) and str(selected_row['Remarks']).strip() != '':
+                        st.markdown("#### 📄 Full Remarks")
+                        st.markdown(f"""
+                        <div style="background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 4px solid #1E88E5; margin: 10px 0;">
+                            <div style="margin-bottom: 10px;">
+                                <strong>Date:</strong> {selected_row['Date']}<br>
+                                <strong>Profit:</strong> ₹{selected_row['Profit']:,.2f}<br>
+                                <strong>Status:</strong> {selected_row['Payment']}
+                            </div>
+                            <div style="background-color: rgba(255,255,255,0.08); padding: 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);">
+                                {selected_row['Remarks']}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.info("No remarks available for the selected transaction.")
+            
             st.markdown("</div>", unsafe_allow_html=True)
             
             # Download button for filtered data
