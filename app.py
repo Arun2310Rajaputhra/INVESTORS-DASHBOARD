@@ -1258,7 +1258,7 @@ def main():
                     'Profit': 'Your Profit With Tax(₹)',
                     'Total_Profit': 'Company Profit (₹)',
                     'Payment': 'Payment Status',
-                    'Remarks': 'Remarks'
+                    'Remarks': 'Remarks - Complete Explanation about your Profit goes where and why it deducted'
                 }),
                 use_container_width=True,
                 hide_index=True
